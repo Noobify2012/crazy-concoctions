@@ -7,13 +7,14 @@ services:
     container_name: concoc_mariasql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: groot
-      MYSQL_PASSWORD: iamgroot
-      MYSQL_DATABASE: concoctionsDB
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_USER: groot
+      MARIADB_PASSWORD: iamgroot
+      MARIADB_DATABASE: concoctionsDB
 
     ports:
       - "6603:3306"
     volumes:
       - ./concoctions.sql:/concoctions
-      - ./init.sql
+      - ./01_init.sql
+      - ./02_starterData.sql
