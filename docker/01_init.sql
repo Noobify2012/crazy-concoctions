@@ -37,7 +37,7 @@ DROP TABLE IF EXISTS ingredient;
 CREATE TABLE ingredient (
   ingredientId  int NOT NULL  AUTO_INCREMENT,
   name          varchar(255)  NOT NULL,
-  class         varchar(255),
+  type          varchar(255),
   description   text,
   isAlcoholic   boolean,
 
@@ -66,7 +66,7 @@ CREATE TABLE drink_ingredient (
   drinkId       int NOT NULL,
   ingredientId  int NOT NULL,
   uomId         int NOT NULL,
-  amount        int NOT NULL,
+  amount        double NOT NULL,
 
   CONSTRAINT drink_ingredient_pk PRIMARY KEY (drinkId, ingredientId, uomId),
   CONSTRAINT drink_ingredient_drinkFk
