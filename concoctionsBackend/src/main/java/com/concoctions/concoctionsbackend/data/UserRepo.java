@@ -7,4 +7,6 @@ import java.util.List;
 public interface UserRepo {
   List<User> getAllUsers();
   User findUserById(long id);
+
+  int save(User user);
 }

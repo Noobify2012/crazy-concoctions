@@ -1,10 +1,9 @@
 package com.concoctions.concoctionsbackend.data;
 
 import com.concoctions.concoctionsbackend.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -30,12 +29,27 @@ public class JdbcUserRepo implements UserRepo {
 
   @Override
   public User findUserById(long id) {
-    String query = String.format("select * from user where userId = %d", id);
-    return jdbcTemplate.query(query, this::mapRowToUser)
-        .stream()
-        .findFirst()
+    return jdbcTemplate.query(
+        "select * from user where userId = ?",
+        this::mapRowToUser,
+        id).stream()
+        .findAny()
         .orElse(null);
+    // todo make sure to actually throw an error here
   }
+
+  @Override
+  public int save(User user) {
+    return jdbcTemplate.update(
+        "insert into user "
+            + "(email, username, password, firstName, lastName, bio) values "
+            + "(?, ?, ?, ?, ?, ?)",
+        user.getEmail(), user.getUsername(), user.getPassword(),
+        user.getFirstName(), user.getLastName(), user.getBio()
+    );
+  }
+
+
 
   private User mapRowToUser(ResultSet row, int rowNum) throws SQLException {
     return User.builder()
