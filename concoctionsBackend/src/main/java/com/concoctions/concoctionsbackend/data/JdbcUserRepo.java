@@ -3,6 +3,8 @@ package com.concoctions.concoctionsbackend.data;
 import com.concoctions.concoctionsbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -24,6 +26,15 @@ public class JdbcUserRepo implements UserRepo {
     return jdbcTemplate.query(
         "select * from user",
         this::mapRowToUser);
+  }
+
+  @Override
+  public User findUserById(long id) {
+    String query = String.format("select * from user where userId = %d", id);
+    return jdbcTemplate.query(query, this::mapRowToUser)
+        .stream()
+        .findFirst()
+        .orElse(null);
   }
 
   private User mapRowToUser(ResultSet row, int rowNum) throws SQLException {
