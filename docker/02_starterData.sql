@@ -25,12 +25,19 @@ INSERT INTO unitOfMeasure (name, type)
 VALUES
 ('ounces', 'fluid');
 
-INSERT INTO ingredient (name, type, description, isAlcoholic)
+INSERT INTO type (name, description)
 VALUES
-('vodka', 'liquor', 'Ukrainian potato water', true),
-('coffee liqueur', 'liqueur', 'boozy coffee', true),
-('espresso', 'coffee', 'high-octane coffee', false),
-('simple syrup', 'syrup', 'sugar water', false);
+('liquor', 'distilled spirits'),
+('liqueur', 'A strong, sweet alcoholic liquor, usually drunk after a meal.'),
+('coffee', 'the elixir of life'),
+('syrup', 'sugary water');
+
+INSERT INTO ingredient (name, typeId, description, isAlcoholic)
+VALUES
+('vodka', 1, 'Ukrainian potato water', true),
+('coffee liqueur', 2, 'boozy coffee', true),
+('espresso', 3, 'high-octane coffee', false),
+('simple syrup', 4, 'sugar water', false);
 
 INSERT INTO drink (userId, categoryId, name, isHot, description)
 VALUES
@@ -57,6 +64,8 @@ VALUES
 INSERT INTO pairing (foodItemId, drinkId)
 VALUES
 (1, 1);
+
+
 
 
 

@@ -33,15 +33,25 @@ CREATE TABLE unitOfMeasure (
   CONSTRAINT unitOfMeasure_pk PRIMARY KEY (uomId)
 );
 
+DROP TABLE IF EXISTS type;
+CREATE TABLE type (
+  typeId  int NOT NULL  AUTO_INCREMENT,
+  name    varchar(255)  NOT NULL,
+  description text,
+  CONSTRAINT type_pk  PRIMARY KEY (typeId)
+);
+
 DROP TABLE IF EXISTS ingredient;
 CREATE TABLE ingredient (
   ingredientId  int NOT NULL  AUTO_INCREMENT,
   name          varchar(255)  NOT NULL,
-  type          varchar(255),
+  typeId        int NOT NULL,
   description   text,
   isAlcoholic   boolean,
 
-  CONSTRAINT ingredient_pk  PRIMARY KEY (ingredientId)
+  CONSTRAINT ingredient_pk  PRIMARY KEY (ingredientId),
+  constraint ingredient_type_fk
+    FOREIGN KEY (typeId) REFERENCES type (typeId)
 );
 
 DROP TABLE IF EXISTS drink;
@@ -111,5 +121,6 @@ CREATE TABLE pairing (
   CONSTRAINT pairing_drinkFk
     FOREIGN KEY (drinkId) REFERENCES drink (drinkId)
 );
+
 
 
