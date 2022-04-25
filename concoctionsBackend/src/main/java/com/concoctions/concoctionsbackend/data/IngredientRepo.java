@@ -7,4 +7,5 @@ import java.util.List;
 public interface IngredientRepo {
 
   List<Ingredient> getAllIngredients();
+  Ingredient getIngredientById(long id);
 }

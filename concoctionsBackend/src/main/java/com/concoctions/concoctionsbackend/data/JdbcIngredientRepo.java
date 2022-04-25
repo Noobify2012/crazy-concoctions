@@ -45,6 +45,17 @@ public class JdbcIngredientRepo implements IngredientRepo {
     );
   }
 
+  @Override
+  public Ingredient getIngredientById(long id) {
+    return jdbcTemplate.query(
+        "select * from ingredient where ingredientId = ?",
+        this::mapRowToIngredient,
+        id).stream()
+        .findFirst()
+        .orElse(null);
+    // todo make sure to actually throw an error here.
+  }
+
   private Ingredient mapRowToIngredient(ResultSet row, int rowNum)
       throws SQLException
   {

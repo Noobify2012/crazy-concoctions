@@ -9,11 +9,12 @@ import java.util.List;
 @Builder
 public class Drink {
   long drinkId;
+  long userId;
   String name;
   Category category;
   boolean isHot;
   String description;
-  List<drink_ingredient> ingredients;
+  List<DrinkIngredient> drinkIngredients;
   List<FoodItem> pairings;
 
 }
