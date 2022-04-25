@@ -1,5 +1,6 @@
-package com.concoctions.concoctionsbackend.data;
+package com.concoctions.concoctionsbackend.data.jdbc;
 
+import com.concoctions.concoctionsbackend.data.UserRepo;
 import com.concoctions.concoctionsbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -41,11 +41,9 @@ public class DrinkController {
   public ResponseEntity<Drink> createDrink(
       @RequestBody Drink drink
   ) {
-
     return ResponseEntity
         .status(HttpStatus.ACCEPTED)
         .body(drink);
-
   }
 
 }

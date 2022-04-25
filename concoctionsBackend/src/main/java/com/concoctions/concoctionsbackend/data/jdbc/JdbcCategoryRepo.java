@@ -1,5 +1,6 @@
-package com.concoctions.concoctionsbackend.data;
+package com.concoctions.concoctionsbackend.data.jdbc;
 
+import com.concoctions.concoctionsbackend.data.CategoryRepo;
 import com.concoctions.concoctionsbackend.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class JdbcCategoryRepo implements CategoryRepo{
+public class JdbcCategoryRepo implements CategoryRepo {
 
   private final JdbcTemplate jdbcTemplate;
 

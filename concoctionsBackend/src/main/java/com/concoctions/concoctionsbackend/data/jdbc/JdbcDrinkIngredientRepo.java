@@ -1,5 +1,8 @@
-package com.concoctions.concoctionsbackend.data;
+package com.concoctions.concoctionsbackend.data.jdbc;
 
+import com.concoctions.concoctionsbackend.data.DrinkIngredientRepo;
+import com.concoctions.concoctionsbackend.data.IngredientRepo;
+import com.concoctions.concoctionsbackend.data.UomRepo;
 import com.concoctions.concoctionsbackend.model.DrinkIngredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
