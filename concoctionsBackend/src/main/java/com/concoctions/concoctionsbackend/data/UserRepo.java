@@ -8,5 +8,7 @@ public interface UserRepo {
   List<User> getAllUsers();
   User findUserById(long id);
 
+  User findUserByEmail(String email);
+
   int save(User user);
 }

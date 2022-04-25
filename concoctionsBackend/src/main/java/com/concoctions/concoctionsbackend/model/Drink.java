@@ -13,7 +13,7 @@ public class Drink {
   Category category;
   boolean isHot;
   String description;
-  List<IngredientAmount> ingredients;
+  List<drink_ingredient> ingredients;
   List<FoodItem> pairings;
 
 }

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface DrinkRepo {
   List<Drink> getAllDrinks();
+  Drink findDrinkById(Long id);
 }

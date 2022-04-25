@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UnitOfMeasure {
-  long uomId;
+public class Type {
+  long typID;
   String name;
-  String type;
+  String description;
+
 }
