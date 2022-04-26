@@ -60,7 +60,10 @@ public class JdbcDrinkRepo implements DrinkRepo {
         .name(row.getString("name"))
         .category(
             categoryRepo
-                .getCategoryById(row.getLong("categoryId")))
+                .getCategoryById(row.getLong("categoryId"))
+                .orElse(null)
+            // todo really need a proper error check here and not just return null
+        )
         .isHot(row.getBoolean("isHot"))
         .description(row.getString("description"))
         .drinkIngredients(

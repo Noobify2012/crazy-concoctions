@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/drinks")
@@ -31,10 +32,16 @@ public class DrinkController {
   }
 
   @GetMapping("/find")
-  public Drink findDrinkById(
+  public ResponseEntity<Drink> findDrinkById(
       @RequestParam Long id
   ){
-    return drinkRepo.findDrinkById(id);
+    Optional<Drink> drink = drinkRepo.findDrinkById(id);
+    return drink
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(null)
+        );
   }
 
   @PostMapping
@@ -44,6 +51,7 @@ public class DrinkController {
     return ResponseEntity
         .status(HttpStatus.ACCEPTED)
         .body(drink);
+    //todo you actually need to implement this shit. . .
   }
 
 }

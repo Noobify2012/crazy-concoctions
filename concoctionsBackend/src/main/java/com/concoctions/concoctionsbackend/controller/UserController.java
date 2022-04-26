@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -28,15 +29,25 @@ public class UserController {
   }
 
   @GetMapping("/all")
-  public List<User> allUsers() {
-    return userRepo.getAllUsers();
+  public ResponseEntity<List<User>> allUsers() {
+    List<User> users = userRepo.getAllUsers();
+    return ResponseEntity
+        .ok()
+        .body(users);
   }
 
   @GetMapping("/find")
-  public User findUserById(
+  public ResponseEntity<User> findUserById(
       @RequestParam Long id
   ){
-    return userRepo.findUserById(id);
+    return userRepo.findUserById(id)
+        .map(value -> ResponseEntity
+          .ok()
+          .body(value))
+        .orElseGet(() -> ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .body(null)
+        );
   }
 
   @PostMapping
@@ -48,8 +59,9 @@ public class UserController {
     log.info("lines effected: {}", linesAffected);
 
     return ResponseEntity
-        .status(HttpStatus.ACCEPTED)
-        .body(user);
+        .status(HttpStatus.NO_CONTENT)
+        .body(null);
+    //todo do I want to return the newly created user?
 
   }
 }

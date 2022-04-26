@@ -32,22 +32,33 @@ public class CommentController {
   @GetMapping("/find")
   public ResponseEntity<List<Comment>> findComment(
       @RequestParam Optional<Long> drinkId,
-      @RequestParam Optional<Long> userId,
-      @RequestParam Optional<Long> commentId
+      @RequestParam Optional<Long> userId
+      // this is clunky
   ){
     List<Comment> comments;
     if(drinkId.isPresent()) {
       comments = commentRepo.getCommentsByDrinkId(drinkId.get());
     } else if (userId.isPresent()) {
       comments = commentRepo.getCommentsByUserId(userId.get());
-    } else if (commentId.isPresent()) {
-      comments = List.of(commentRepo.getCommentById(commentId.get()));
-      //todo error check that comment actually returned something
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
     return ResponseEntity
         .status(HttpStatus.ACCEPTED)
         .body(comments);
   }
+
+  @GetMapping("/find/byId")
+  public ResponseEntity<Comment> findCommentById(
+      @RequestParam long commentId
+  ){
+    // todo need a better error return when no commentId provided
+    Optional<Comment> comment = commentRepo.getCommentById(commentId);
+    return comment.map(value -> ResponseEntity.ok(comment.get()))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(null)
+        );
+  }
+
 }
