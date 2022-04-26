@@ -2,12 +2,17 @@ package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.IngredientRepo;
 import com.concoctions.concoctionsbackend.data.TypeRepo;
-import com.concoctions.concoctionsbackend.dto.Ingredient;
-import com.concoctions.concoctionsbackend.dto.Type;
+import com.concoctions.concoctionsbackend.dto.IngredientDto;
+import com.concoctions.concoctionsbackend.model.Ingredient;
+import com.concoctions.concoctionsbackend.model.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,17 +23,25 @@ public class JdbcIngredientRepo implements IngredientRepo {
 
   private final JdbcTemplate jdbcTemplate;
   private final TypeRepo typeRepo;
+  private final SimpleJdbcInsert simpleJdbcInsert;
 
   @Autowired
-  public JdbcIngredientRepo(JdbcTemplate jdbcTemplate, TypeRepo typeRepo) {
+  public JdbcIngredientRepo(
+      JdbcTemplate jdbcTemplate,
+      TypeRepo typeRepo,
+      DataSource dataSource
+  ) {
     this.jdbcTemplate = jdbcTemplate;
     this.typeRepo = typeRepo;
+    this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+        .withTableName("ingredient")
+        .usingGeneratedKeyColumns("ingredientId");
   }
 
 
   @Override
-  public List<Ingredient> getAllIngredients() {
-    List<Type> types = typeRepo.getAllTypes();
+  public List<Ingredient> getAll() {
+    List<Type> types = typeRepo.getAll();
     return jdbcTemplate.query(
         "select * from ingredient",
         (row, rowNum) -> {
@@ -49,7 +62,7 @@ public class JdbcIngredientRepo implements IngredientRepo {
   }
 
   @Override
-  public Optional<Ingredient> getIngredientById(long ingredientId) {
+  public Optional<Ingredient> getById(long ingredientId) {
     return jdbcTemplate.query(
         "select * from ingredient where ingredientId = ?",
         this::mapRowToIngredient,
@@ -58,7 +71,19 @@ public class JdbcIngredientRepo implements IngredientRepo {
   }
 
   @Override
-  public int deleteIngredientById(long ingredientId) {
+  public Optional<Ingredient> save(IngredientDto ingredientDto) {
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("name", ingredientDto.getName())
+        .addValue("typeId", ingredientDto.getTypeId())
+        .addValue("description", ingredientDto.getDescription())
+        .addValue("isAlcoholic", ingredientDto.isAlcoholic());
+
+    Number key = simpleJdbcInsert.executeAndReturnKey(params);
+    return this.getById(key.longValue()).stream().findFirst();
+  }
+
+  @Override
+  public int deleteById(long ingredientId) {
     return jdbcTemplate.update(
         "delete from ingredient where ingredientId = ?",
         ingredientId);
@@ -71,8 +96,9 @@ public class JdbcIngredientRepo implements IngredientRepo {
         .ingredientId(row.getLong("ingredientId"))
         .name(row.getString("name"))
         .description(row.getString("description"))
-        .type(typeRepo.getTypeById(row.getLong("typeId")).orElse(null))
+        .type(typeRepo.getById(row.getLong("typeId")).orElse(null))
         // todo make sure to actually throw an error here.
+        .isAlcoholic(row.getBoolean("isAlcoholic"))
         .build();
   }
 

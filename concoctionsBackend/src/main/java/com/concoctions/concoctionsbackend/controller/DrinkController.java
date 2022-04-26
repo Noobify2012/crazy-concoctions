@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.DrinkRepo;
-import com.concoctions.concoctionsbackend.dto.Drink;
+import com.concoctions.concoctionsbackend.model.Drink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +31,14 @@ public class DrinkController {
 
   @GetMapping("/all")
   public List<Drink> allDrinks() {
-    return drinkRepo.getAllDrinks();
+    return drinkRepo.getAll();
   }
 
   @GetMapping("/find")
   public ResponseEntity<Drink> findDrinkById(
       @RequestParam Long id
   ){
-    Optional<Drink> drink = drinkRepo.findDrinkById(id);
+    Optional<Drink> drink = drinkRepo.findById(id);
     return drink
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity

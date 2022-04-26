@@ -1,6 +1,7 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.dto.User;
+import com.concoctions.concoctionsbackend.dto.UserDto;
+import com.concoctions.concoctionsbackend.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,10 +10,10 @@ public interface UserRepo {
 
   Optional<User> findUserByUsernameAndPassword(String username, String password);
 
-  List<User> getAllUsers();
-  Optional<User> findUserById(long id);
-  Optional<User> findUserByEmail(String email);
-  int save(User user);
+  List<User> getAll();
+  Optional<User> getById(long id);
+  Optional<User> getByEmail(String email);
+  Optional<User> save(UserDto userDto);
   // todo this should not return int (the affected rows) but probably the newly
   // created user.
 

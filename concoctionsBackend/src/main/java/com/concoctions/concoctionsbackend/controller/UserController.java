@@ -1,7 +1,8 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.dto.User;
+import com.concoctions.concoctionsbackend.dto.UserDto;
+import com.concoctions.concoctionsbackend.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserController {
 
   @GetMapping("/all")
   public ResponseEntity<List<User>> allUsers() {
-    List<User> users = userRepo.getAllUsers();
+    List<User> users = userRepo.getAll();
     return ResponseEntity
         .ok()
         .body(users);
@@ -41,7 +42,7 @@ public class UserController {
   public ResponseEntity<User> findUserById(
       @PathVariable long userId
   ){
-    return userRepo.findUserById(userId)
+    return userRepo.getById(userId)
         .map(value -> ResponseEntity
           .ok()
           .body(value))
@@ -51,18 +52,17 @@ public class UserController {
         );
   }
 
-  @PostMapping
+  @PostMapping("/save")
   public ResponseEntity<User> createUser(
-      @RequestBody User user
+      @RequestBody UserDto userDto
   ) {
-    log.info("{}", user);
-    int linesAffected = userRepo.save(user);
-    log.info("lines effected: {}", linesAffected);
-
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .body(null);
-    //todo do I want to return the newly created user?
+    return userRepo.save(userDto)
+        .map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null));
   }
 
   @DeleteMapping("/delete/{userId}")

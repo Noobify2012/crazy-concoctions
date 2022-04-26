@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.UomRepo;
-import com.concoctions.concoctionsbackend.dto.UnitOfMeasure;
+import com.concoctions.concoctionsbackend.model.UnitOfMeasure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

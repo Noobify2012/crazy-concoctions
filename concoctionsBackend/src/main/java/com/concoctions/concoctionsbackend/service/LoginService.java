@@ -1,8 +1,8 @@
 package com.concoctions.concoctionsbackend.service;
 
 import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.dto.LoginUser;
-import com.concoctions.concoctionsbackend.dto.User;
+import com.concoctions.concoctionsbackend.dto.LoginUserDto;
+import com.concoctions.concoctionsbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +18,11 @@ public class LoginService {
     this.userRepo = userRepo;
   }
 
-  public Optional<User> login(LoginUser loginUser) {
+  public Optional<User> login(LoginUserDto loginUserDto) {
     return userRepo
         .findUserByUsernameAndPassword(
-            loginUser.getUsername(),
-            loginUser.getPassword()
+            loginUserDto.getUsername(),
+            loginUserDto.getPassword()
         );
 
   }

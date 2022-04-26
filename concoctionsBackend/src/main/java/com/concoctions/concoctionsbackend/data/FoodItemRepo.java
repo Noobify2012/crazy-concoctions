@@ -1,14 +1,16 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.dto.FoodItem;
+import com.concoctions.concoctionsbackend.dto.FoodItemDto;
+import com.concoctions.concoctionsbackend.model.FoodItem;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface FoodItemRepo {
-  List<FoodItem> getAllFoodItems();
-  List<FoodItem> getAllFoodItemsByDrinkId(long foodItemId);
-  Optional<FoodItem> getFoodItemById(long foodItemId);
+  List<FoodItem> getAll();
+  List<FoodItem> getAllByDrinkId(long foodItemId);
+  Optional<FoodItem> getById(long foodItemId);
+  Optional<FoodItem> save(FoodItemDto foodItemDto);
   int deleteFoodItemById(long foodItemId);
 
 }
