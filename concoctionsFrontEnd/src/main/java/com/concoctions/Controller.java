@@ -1,10 +1,14 @@
 package com.concoctions;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 
 public interface Controller {
-    void start() throws IOException, InterruptedException;
-    void login() throws IOException, InterruptedException;
+    void start() throws IOException, InterruptedException, JSONException;
+    void login() throws IOException, InterruptedException, JSONException;
+
+    void createProfile();
 
     void buildNewRecipe();
 

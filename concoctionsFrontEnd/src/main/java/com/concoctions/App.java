@@ -1,13 +1,12 @@
 package com.concoctions;
 
-import sun.net.www.http.HttpClient;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
 import static java.net.http.HttpClient.newHttpClient;
-import static sun.net.www.http.HttpClient.*;
 
 /**
  * Hello world!
@@ -15,7 +14,7 @@ import static sun.net.www.http.HttpClient.*;
  */
 public class App 
 {
-    public static void main( String[] args ) throws IOException, InterruptedException {
+    public static void main( String[] args ) throws IOException, InterruptedException, JSONException {
         java.net.http.HttpClient client = newHttpClient();
         System.out.println( "Welcome to Concoctions!" );
         Scanner in = new Scanner((System.in));
