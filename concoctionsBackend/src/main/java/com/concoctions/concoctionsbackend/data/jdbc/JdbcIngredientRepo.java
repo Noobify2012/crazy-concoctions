@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcIngredientRepo implements IngredientRepo {
@@ -48,14 +49,12 @@ public class JdbcIngredientRepo implements IngredientRepo {
   }
 
   @Override
-  public Ingredient getIngredientById(long id) {
+  public Optional<Ingredient> getIngredientById(long id) {
     return jdbcTemplate.query(
         "select * from ingredient where ingredientId = ?",
         this::mapRowToIngredient,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   private Ingredient mapRowToIngredient(ResultSet row, int rowNum)
@@ -65,7 +64,8 @@ public class JdbcIngredientRepo implements IngredientRepo {
         .ingredientId(row.getLong("ingredientId"))
         .name(row.getString("name"))
         .description(row.getString("description"))
-        .type(typeRepo.getTypeById(row.getLong("typeId")))
+        .type(typeRepo.getTypeById(row.getLong("typeId")).orElse(null))
+        // todo make sure to actually throw an error here.
         .build();
   }
 

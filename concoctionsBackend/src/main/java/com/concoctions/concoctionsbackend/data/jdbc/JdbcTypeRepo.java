@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcTypeRepo implements TypeRepo {
@@ -29,26 +30,22 @@ public class JdbcTypeRepo implements TypeRepo {
   }
 
   @Override
-  public Type getTypeById(long id) {
+  public Optional<Type> getTypeById(long id) {
     return jdbcTemplate.query(
         "select * from type where typeId = ?",
         this::mapRowToType,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
 
   }
 
   @Override
-  public Type getTypeByName(String name) {
+  public Optional<Type> getTypeByName(String name) {
     return jdbcTemplate.query(
         "select * from type where name like ?",
         this::mapRowToType,
         name).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   private Type mapRowToType(ResultSet row, int rowNum) throws SQLException {

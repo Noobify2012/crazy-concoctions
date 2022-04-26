@@ -3,9 +3,10 @@ package com.concoctions.concoctionsbackend.data;
 import com.concoctions.concoctionsbackend.model.Ingredient;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IngredientRepo {
 
   List<Ingredient> getAllIngredients();
-  Ingredient getIngredientById(long id);
+  Optional<Ingredient> getIngredientById(long id);
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcCommentRepo implements CommentRepo {
@@ -45,14 +46,12 @@ public class JdbcCommentRepo implements CommentRepo {
   }
 
   @Override
-  public Comment getCommentById(long commentId) {
+  public Optional<Comment> getCommentById(long commentId) {
     return jdbcTemplate.query(
         "select * from comment where commentId = ?",
         this::mapRowToComment,
         commentId).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   private Comment mapRowToComment(ResultSet row, int rowNum)

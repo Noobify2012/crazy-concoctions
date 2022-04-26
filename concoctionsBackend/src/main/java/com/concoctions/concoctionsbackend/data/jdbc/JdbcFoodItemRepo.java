@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcFoodItemRepo implements FoodItemRepo {
@@ -56,14 +57,12 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public FoodItem getFoodItemById(long id) {
+  public Optional<FoodItem> getFoodItemById(long id) {
     return jdbcTemplate.query(
         "select * from foodItem where foodItemId = ?",
         this::mapRowToFoodItems,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
 

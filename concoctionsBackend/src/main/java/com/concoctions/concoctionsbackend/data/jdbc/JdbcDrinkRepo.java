@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcDrinkRepo implements DrinkRepo {
@@ -43,14 +44,12 @@ public class JdbcDrinkRepo implements DrinkRepo {
   }
 
   @Override
-  public Drink findDrinkById(Long id) {
+  public Optional<Drink> findDrinkById(Long id) {
     return jdbcTemplate.query(
         "select * from drink where drinkId = ?",
         this::mapRowToDrink,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
 

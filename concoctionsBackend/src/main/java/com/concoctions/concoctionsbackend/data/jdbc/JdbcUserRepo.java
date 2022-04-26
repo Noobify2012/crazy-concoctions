@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcUserRepo implements UserRepo {
@@ -28,25 +29,21 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public User findUserById(long id) {
+  public Optional<User> findUserById(long id) {
     return jdbcTemplate.query(
         "select * from user where userId = ?",
         this::mapRowToUser,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   @Override
-  public User findUserByEmail(String email) {
+  public Optional<User> findUserByEmail(String email) {
     return jdbcTemplate.query(
         "select * from user where email = ?",
         this::mapRowToUser,
         email).stream()
-        .findFirst()
-        .orElse(null);
-    // todo same as above, actually throw an error here.
+        .findFirst();
   }
 
   @Override

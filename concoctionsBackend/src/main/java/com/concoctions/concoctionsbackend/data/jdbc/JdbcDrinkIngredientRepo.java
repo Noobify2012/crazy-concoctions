@@ -42,8 +42,11 @@ public class JdbcDrinkIngredientRepo implements DrinkIngredientRepo {
       throws SQLException
   {
     return new DrinkIngredient(
-        uomRepo.getUomById(row.getLong("uomId")),
-        ingredientRepo.getIngredientById(row.getLong("ingredientId")),
+        // todo make sure to actually throw an error here and not just pass null
+        uomRepo.getUomById(row.getLong("uomId"))
+            .orElse(null),
+        ingredientRepo.getIngredientById(row.getLong("ingredientId"))
+            .orElse(null),
         row.getDouble("amount")
     );
   }

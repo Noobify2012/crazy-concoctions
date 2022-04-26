@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcUomRepo implements UomRepo {
@@ -30,25 +31,21 @@ public class JdbcUomRepo implements UomRepo {
   }
 
   @Override
-  public UnitOfMeasure getUomById(long id) {
+  public Optional<UnitOfMeasure> getUomById(long id) {
     return jdbcTemplate.query(
         "select * from unitOfMeasure where uomId = ?",
         this::mapRowToUom,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   @Override
-  public UnitOfMeasure getUomByName(String name) {
+  public Optional<UnitOfMeasure> getUomByName(String name) {
     return jdbcTemplate.query(
         "select * from unitOfMeasure where name = ?",
         this::mapRowToUom,
         name).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   private UnitOfMeasure mapRowToUom(ResultSet row, int rowNum)
