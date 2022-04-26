@@ -1,12 +1,11 @@
 package com.concoctions.concoctionsbackend.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class Category {
-  private long categoryId;
+public class TypeDto {
   private String name;
   private String description;
+
+
 }

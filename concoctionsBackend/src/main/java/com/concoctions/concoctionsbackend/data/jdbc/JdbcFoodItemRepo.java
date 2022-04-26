@@ -1,14 +1,17 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.FoodItemRepo;
-import com.concoctions.concoctionsbackend.dto.FoodItem;
+import com.concoctions.concoctionsbackend.dto.FoodItemDto;
+import com.concoctions.concoctionsbackend.model.FoodItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,19 +22,23 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+  private final SimpleJdbcInsert simpleJdbcInsert;
 
   @Autowired
   public JdbcFoodItemRepo(
       JdbcTemplate jdbcTemplate,
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate
-
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+      DataSource dataSource
   ) {
     this.jdbcTemplate = jdbcTemplate;
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+        .withTableName("foodItem")
+        .usingGeneratedKeyColumns("foodItemId");
   }
 
   @Override
-  public List<FoodItem> getAllFoodItems() {
+  public List<FoodItem> getAll() {
     return jdbcTemplate.query(
         "select * from foodItem",
         this::mapRowToFoodItems
@@ -39,7 +46,7 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public List<FoodItem> getAllFoodItemsByDrinkId(long foodItemId) {
+  public List<FoodItem> getAllByDrinkId(long foodItemId) {
     List<Long> foodItemIds = jdbcTemplate.query(
         "select foodItemId from pairing where drinkId = ?",
         (row, rowNum) -> row.getLong("foodItemId"),
@@ -57,12 +64,22 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public Optional<FoodItem> getFoodItemById(long foodItemId) {
+  public Optional<FoodItem> getById(long foodItemId) {
     return jdbcTemplate.query(
         "select * from foodItem where foodItemId = ?",
         this::mapRowToFoodItems,
             foodItemId).stream()
         .findFirst();
+  }
+
+  @Override
+  public Optional<FoodItem> save(FoodItemDto foodItemDto) {
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("name", foodItemDto.getName());
+
+    Number key = simpleJdbcInsert.executeAndReturnKey(params);
+    return this.getById(key.longValue()).stream().findFirst();
+
   }
 
   @Override

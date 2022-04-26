@@ -1,12 +1,14 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.dto.Drink;
+import com.concoctions.concoctionsbackend.dto.DrinkDto;
+import com.concoctions.concoctionsbackend.model.Drink;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface DrinkRepo {
-  List<Drink> getAllDrinks();
-  Optional<Drink> findDrinkById(long drinkId);
+  List<Drink> getAll();
+  Optional<Drink> findById(long drinkId);
+  Optional<Drink> save(DrinkDto drinkDto);
   int deleteDrinkById(long drinkId);
 }

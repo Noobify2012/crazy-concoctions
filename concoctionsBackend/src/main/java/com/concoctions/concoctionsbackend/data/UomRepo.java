@@ -1,6 +1,6 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.dto.UnitOfMeasure;
+import com.concoctions.concoctionsbackend.model.UnitOfMeasure;
 
 import java.util.List;
 import java.util.Optional;

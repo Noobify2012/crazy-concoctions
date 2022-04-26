@@ -1,8 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
-import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.dto.LoginUser;
-import com.concoctions.concoctionsbackend.dto.User;
+import com.concoctions.concoctionsbackend.dto.LoginUserDto;
+import com.concoctions.concoctionsbackend.model.User;
 import com.concoctions.concoctionsbackend.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,9 +27,9 @@ public class StupidLoginController {
 
   @PostMapping
   public ResponseEntity<User> stupidLogin(
-      @RequestBody LoginUser loginUser
+      @RequestBody LoginUserDto loginUserDto
   ){
-    Optional<User> user = loginService.login(loginUser);
+    Optional<User> user = loginService.login(loginUserDto);
     return user.map(result -> ResponseEntity
             .ok()
             .body(result))

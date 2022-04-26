@@ -1,12 +1,9 @@
 package com.concoctions.concoctionsbackend.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class User {
-  private long userId;
+public class UserDto {
   private String email;
   private String username;
   private String password;

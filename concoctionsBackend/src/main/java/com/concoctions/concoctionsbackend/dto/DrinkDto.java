@@ -1,20 +1,16 @@
 package com.concoctions.concoctionsbackend.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@Builder
-public class Drink {
-  private long drinkId;
+public class DrinkDto {
   private long userId;
   private String name;
-  private Category category;
+  private long categoryId;
   private boolean isHot;
   private String description;
-  private List<DrinkIngredient> drinkIngredients;
-  private List<FoodItem> pairings;
-
+  private List<DrinkIngredientDto> drinkIngredientDtos;
+  private List<Long> foodItemIds;
 }

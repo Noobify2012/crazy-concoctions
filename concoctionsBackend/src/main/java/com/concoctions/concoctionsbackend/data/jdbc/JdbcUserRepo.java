@@ -1,14 +1,17 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.dto.User;
+import com.concoctions.concoctionsbackend.dto.UserDto;
+import com.concoctions.concoctionsbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,14 +21,19 @@ import java.util.Optional;
 public class JdbcUserRepo implements UserRepo {
 
   private final JdbcTemplate jdbcTemplate;
+  private final SimpleJdbcInsert simpleJdbcInsert;
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
   @Autowired
   public JdbcUserRepo(
       JdbcTemplate jdbcTemplate,
+      DataSource dataSource,
       NamedParameterJdbcTemplate namedParameterJdbcTemplate
   ) {
     this.jdbcTemplate = jdbcTemplate;
+    this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+        .withTableName("user")
+        .usingGeneratedKeyColumns("userId");
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
   }
 
@@ -42,14 +50,14 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public List<User> getAllUsers() {
+  public List<User> getAll() {
     return jdbcTemplate.query(
         "select * from user",
         this::mapRowToUser);
   }
 
   @Override
-  public Optional<User> findUserById(long id) {
+  public Optional<User> getById(long id) {
     return jdbcTemplate.query(
         "select * from user where userId = ?",
         this::mapRowToUser,
@@ -58,7 +66,7 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public Optional<User> findUserByEmail(String email) {
+  public Optional<User> getByEmail(String email) {
     return jdbcTemplate.query(
         "select * from user where email = ?",
         this::mapRowToUser,
@@ -67,17 +75,18 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public int save(User user) {
-    // todo if we want to return the same user, but now with the ID, we'll
-    //  have to the special jdbcTemplate thing that gives us the results of the
-    //  insert
-    return jdbcTemplate.update(
-        "insert into user "
-            + "(email, username, password, firstName, lastName, bio) values "
-            + "(?, ?, ?, ?, ?, ?)",
-        user.getEmail(), user.getUsername(), user.getPassword(),
-        user.getFirstName(), user.getLastName(), user.getBio()
-    );
+  public Optional<User> save(UserDto userDto) {
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("email", userDto.getEmail())
+        .addValue("username", userDto.getUsername())
+        .addValue("password", userDto.getPassword())
+        .addValue("firstName", userDto.getFirstName())
+        .addValue("lastName", userDto.getLastName())
+        .addValue("bio", userDto.getBio());
+
+    Number key = simpleJdbcInsert.executeAndReturnKey(params);
+    return this.getById(key.longValue()).stream().findFirst();
+
   }
 
   @Override
@@ -93,7 +102,7 @@ public class JdbcUserRepo implements UserRepo {
         .userId(row.getLong("userId"))
         .email(row.getString("email"))
         .username(row.getString("username"))
-        .password(row.getString("password"))
+//        .password(row.getString("password"))
         .firstName(row.getString("firstName"))
         .lastName(row.getString("lastName"))
         .bio(row.getString("bio"))
