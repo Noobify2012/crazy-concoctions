@@ -4,6 +4,9 @@ import com.concoctions.concoctionsbackend.data.UserRepo;
 import com.concoctions.concoctionsbackend.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -15,10 +18,27 @@ import java.util.Optional;
 public class JdbcUserRepo implements UserRepo {
 
   private final JdbcTemplate jdbcTemplate;
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
   @Autowired
-  public JdbcUserRepo(JdbcTemplate jdbcTemplate) {
+  public JdbcUserRepo(
+      JdbcTemplate jdbcTemplate,
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate
+  ) {
     this.jdbcTemplate = jdbcTemplate;
+    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+  }
+
+  @Override
+  public Optional<User> findUserByUsernameAndPassword(String username, String password) {
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("username", username)
+        .addValue("password", password);
+    return namedParameterJdbcTemplate.query(
+        "select * from user where username = :username and password = :password",
+        params,
+        this::mapRowToUser
+    ).stream().findFirst();
   }
 
   @Override
