@@ -1,9 +1,11 @@
 package com.concoctions.concoctionsbackend.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class IngredientAmount {
+@AllArgsConstructor
+public class DrinkIngredient {
   UnitOfMeasure uom;
   Ingredient ingredient;
   double amount;

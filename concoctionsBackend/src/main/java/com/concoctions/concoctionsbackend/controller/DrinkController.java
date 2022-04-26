@@ -1,8 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
-import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.model.User;
-import lombok.extern.slf4j.Slf4j;
+import com.concoctions.concoctionsbackend.data.DrinkRepo;
+import com.concoctions.concoctionsbackend.model.Drink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,41 +14,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Slf4j
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/drinks")
+public class DrinkController {
 
-  private final UserRepo userRepo;
+  private final DrinkRepo drinkRepo;
 
   @Autowired
-  public UserController(UserRepo userRepo) {
-    this.userRepo = userRepo;
+  public DrinkController(DrinkRepo drinkRepo) {
+    this.drinkRepo = drinkRepo;
   }
 
   @GetMapping("/all")
-  public List<User> allUsers() {
-    return userRepo.getAllUsers();
+  public List<Drink> allDrinks() {
+    return drinkRepo.getAllDrinks();
   }
 
   @GetMapping("/find")
-  public User findUserById(
+  public Drink findDrinkById(
       @RequestParam Long id
   ){
-    return userRepo.findUserById(id);
+    return drinkRepo.findDrinkById(id);
   }
 
   @PostMapping
-  public ResponseEntity<User> createUser(
-      @RequestBody User user
+  public ResponseEntity<Drink> createDrink(
+      @RequestBody Drink drink
   ) {
-    log.info("{}", user);
-    int linesAffected = userRepo.save(user);
-    log.info("lines effected: {}", linesAffected);
-
     return ResponseEntity
         .status(HttpStatus.ACCEPTED)
-        .body(user);
-
+        .body(drink);
   }
+
 }

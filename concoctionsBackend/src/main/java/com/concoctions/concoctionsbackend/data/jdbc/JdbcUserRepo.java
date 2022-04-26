@@ -1,10 +1,9 @@
-package com.concoctions.concoctionsbackend.data;
+package com.concoctions.concoctionsbackend.data.jdbc;
 
+import com.concoctions.concoctionsbackend.data.UserRepo;
 import com.concoctions.concoctionsbackend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -30,11 +29,38 @@ public class JdbcUserRepo implements UserRepo {
 
   @Override
   public User findUserById(long id) {
-    String query = String.format("select * from user where userId = %d", id);
-    return jdbcTemplate.query(query, this::mapRowToUser)
-        .stream()
+    return jdbcTemplate.query(
+        "select * from user where userId = ?",
+        this::mapRowToUser,
+        id).stream()
         .findFirst()
         .orElse(null);
+    // todo make sure to actually throw an error here.
+  }
+
+  @Override
+  public User findUserByEmail(String email) {
+    return jdbcTemplate.query(
+        "select * from user where email = ?",
+        this::mapRowToUser,
+        email).stream()
+        .findFirst()
+        .orElse(null);
+    // todo same as above, actually throw an error here.
+  }
+
+  @Override
+  public int save(User user) {
+    // todo if we want to return the same user, but now with the ID, we'll
+    //  have to the special jdbcTemplate thing that gives us the results of the
+    //  insert
+    return jdbcTemplate.update(
+        "insert into user "
+            + "(email, username, password, firstName, lastName, bio) values "
+            + "(?, ?, ?, ?, ?, ?)",
+        user.getEmail(), user.getUsername(), user.getPassword(),
+        user.getFirstName(), user.getLastName(), user.getBio()
+    );
   }
 
   private User mapRowToUser(ResultSet row, int rowNum) throws SQLException {

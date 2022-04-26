@@ -8,6 +8,6 @@ import lombok.Data;
 public class Ingredient {
   long ingredientId;
   String name;
-  String type;
+  Type type;
   String description;
 }
