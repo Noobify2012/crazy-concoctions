@@ -1,11 +1,13 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.model.Ingredient;
+import com.concoctions.concoctionsbackend.dto.Ingredient;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IngredientRepo {
 
   List<Ingredient> getAllIngredients();
-  Ingredient getIngredientById(long id);
+  Optional<Ingredient> getIngredientById(long ingredientId);
+  int deleteIngredientById(long ingredientId);
 }

@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.UserRepo;
-import com.concoctions.concoctionsbackend.model.User;
+import com.concoctions.concoctionsbackend.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcUserRepo implements UserRepo {
@@ -28,25 +29,21 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public User findUserById(long id) {
+  public Optional<User> findUserById(long id) {
     return jdbcTemplate.query(
         "select * from user where userId = ?",
         this::mapRowToUser,
         id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
   }
 
   @Override
-  public User findUserByEmail(String email) {
+  public Optional<User> findUserByEmail(String email) {
     return jdbcTemplate.query(
         "select * from user where email = ?",
         this::mapRowToUser,
         email).stream()
-        .findFirst()
-        .orElse(null);
-    // todo same as above, actually throw an error here.
+        .findFirst();
   }
 
   @Override
@@ -60,6 +57,14 @@ public class JdbcUserRepo implements UserRepo {
             + "(?, ?, ?, ?, ?, ?)",
         user.getEmail(), user.getUsername(), user.getPassword(),
         user.getFirstName(), user.getLastName(), user.getBio()
+    );
+  }
+
+  @Override
+  public int deleteById(long id) {
+    return jdbcTemplate.update(
+        "delete from user where userId = ?",
+        id
     );
   }
 

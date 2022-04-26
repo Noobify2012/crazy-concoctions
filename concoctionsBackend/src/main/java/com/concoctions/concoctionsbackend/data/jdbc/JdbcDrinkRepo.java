@@ -4,7 +4,7 @@ import com.concoctions.concoctionsbackend.data.CategoryRepo;
 import com.concoctions.concoctionsbackend.data.DrinkIngredientRepo;
 import com.concoctions.concoctionsbackend.data.DrinkRepo;
 import com.concoctions.concoctionsbackend.data.FoodItemRepo;
-import com.concoctions.concoctionsbackend.model.Drink;
+import com.concoctions.concoctionsbackend.dto.Drink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcDrinkRepo implements DrinkRepo {
@@ -43,16 +44,20 @@ public class JdbcDrinkRepo implements DrinkRepo {
   }
 
   @Override
-  public Drink findDrinkById(Long id) {
+  public Optional<Drink> findDrinkById(long drinkId) {
     return jdbcTemplate.query(
         "select * from drink where drinkId = ?",
         this::mapRowToDrink,
-        id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        drinkId).stream()
+        .findFirst();
   }
 
+  @Override
+  public int deleteDrinkById(long drinkId) {
+    return jdbcTemplate.update(
+        "delete from drink where drinkId = ?",
+        drinkId);
+  }
 
   private Drink mapRowToDrink(ResultSet row, int rowNum) throws SQLException {
     return Drink.builder()
@@ -61,7 +66,10 @@ public class JdbcDrinkRepo implements DrinkRepo {
         .name(row.getString("name"))
         .category(
             categoryRepo
-                .getCategoryById(row.getLong("categoryId")))
+                .getCategoryById(row.getLong("categoryId"))
+                .orElse(null)
+            // todo really need a proper error check here and not just return null
+        )
         .isHot(row.getBoolean("isHot"))
         .description(row.getString("description"))
         .drinkIngredients(

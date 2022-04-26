@@ -1,4 +1,4 @@
-package com.concoctions.concoctionsbackend.model;
+package com.concoctions.concoctionsbackend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FoodItem {
-  long foodItemId;
-  String name;
+  private long foodItemId;
+  private String name;
 }

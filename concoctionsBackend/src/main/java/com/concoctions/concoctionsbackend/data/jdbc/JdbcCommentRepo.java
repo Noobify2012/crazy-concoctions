@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.CommentRepo;
-import com.concoctions.concoctionsbackend.model.Comment;
+import com.concoctions.concoctionsbackend.dto.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcCommentRepo implements CommentRepo {
@@ -45,14 +46,20 @@ public class JdbcCommentRepo implements CommentRepo {
   }
 
   @Override
-  public Comment getCommentById(long commentId) {
+  public Optional<Comment> getCommentById(long commentId) {
     return jdbcTemplate.query(
         "select * from comment where commentId = ?",
         this::mapRowToComment,
         commentId).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
+  }
+
+  @Override
+  public int deleteByID(long commentId) {
+    return jdbcTemplate.update(
+        "delete from comment where commentId = ?",
+        commentId
+    );
   }
 
   private Comment mapRowToComment(ResultSet row, int rowNum)

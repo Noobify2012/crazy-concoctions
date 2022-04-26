@@ -11,6 +11,7 @@ CREATE TABLE user (
   firstName   varchar(255)  NOT NULL,
   lastName    varchar(255)  NOT NULL,
   bio         text,
+  
   CONSTRAINT  user_pk PRIMARY KEY (userId),
   CONSTRAINT  user_unique UNIQUE (email)
 );
@@ -38,6 +39,7 @@ CREATE TABLE type (
   typeId  int NOT NULL  AUTO_INCREMENT,
   name    varchar(255)  NOT NULL,
   description text,
+
   CONSTRAINT type_pk  PRIMARY KEY (typeId)
 );
 
@@ -52,6 +54,8 @@ CREATE TABLE ingredient (
   CONSTRAINT ingredient_pk  PRIMARY KEY (ingredientId),
   constraint ingredient_type_fk
     FOREIGN KEY (typeId) REFERENCES type (typeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS drink;
@@ -66,9 +70,13 @@ CREATE TABLE drink (
   CONSTRAINT drink_pk 
     PRIMARY KEY (drinkId),
   CONSTRAINT drink_userFk 
-    FOREIGN KEY (userId) REFERENCES user (userId),
+    FOREIGN KEY (userId) REFERENCES user (userId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT drunk_categoryFk
     FOREIGN KEY (categoryId) REFERENCES category (categoryId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS drink_ingredient;
@@ -80,11 +88,17 @@ CREATE TABLE drink_ingredient (
 
   CONSTRAINT drink_ingredient_pk PRIMARY KEY (drinkId, ingredientId, uomId),
   CONSTRAINT drink_ingredient_drinkFk
-    FOREIGN KEY (drinkId) REFERENCES drink (drinkId),
+    FOREIGN KEY (drinkId) REFERENCES drink (drinkId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT drink_ingredient_ingredientFk
-    FOREIGN KEY (ingredientId) REFERENCES ingredient (ingredientId),
+    FOREIGN KEY (ingredientId) REFERENCES ingredient (ingredientId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT drink_ingredient_uomFk
     FOREIGN KEY (uomId) REFERENCES unitOfMeasure (uomId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 
@@ -98,9 +112,13 @@ CREATE TABLE comment (
 
   CONSTRAINT comment_pk PRIMARY KEY (commentId),
   CONSTRAINT comment_user_fk
-    FOREIGN KEY (userId) REFERENCES user (userId),
+    FOREIGN KEY (userId) REFERENCES user (userId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT comment_drink_fk
     FOREIGN KEY (drinkId) REFERENCES drink (drinkId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS foodItem;
@@ -117,9 +135,13 @@ CREATE TABLE pairing (
   drinkId     INT NOT NULL,
 
   CONSTRAINT pairing_foodItemFk
-    FOREIGN KEY (foodItemId) REFERENCES foodItem (foodItemId),
+    FOREIGN KEY (foodItemId) REFERENCES foodItem (foodItemId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT pairing_drinkFk
     FOREIGN KEY (drinkId) REFERENCES drink (drinkId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 

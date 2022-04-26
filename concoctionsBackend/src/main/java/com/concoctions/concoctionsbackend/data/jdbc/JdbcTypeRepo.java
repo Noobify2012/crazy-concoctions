@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.TypeRepo;
-import com.concoctions.concoctionsbackend.model.Type;
+import com.concoctions.concoctionsbackend.dto.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcTypeRepo implements TypeRepo {
@@ -29,26 +30,31 @@ public class JdbcTypeRepo implements TypeRepo {
   }
 
   @Override
-  public Type getTypeById(long id) {
+  public Optional<Type> getTypeById(long typeId) {
     return jdbcTemplate.query(
         "select * from type where typeId = ?",
         this::mapRowToType,
-        id).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+            typeId).stream()
+        .findFirst();
 
   }
 
   @Override
-  public Type getTypeByName(String name) {
+  public Optional<Type> getTypeByName(String name) {
     return jdbcTemplate.query(
         "select * from type where name like ?",
         this::mapRowToType,
         name).stream()
-        .findFirst()
-        .orElse(null);
-    // todo make sure to actually throw an error here.
+        .findFirst();
+  }
+
+  @Override
+  public int deleteById(long typeId) {
+    return jdbcTemplate.update(
+        "delete from type where typeId = ?",
+        typeId
+    );
+
   }
 
   private Type mapRowToType(ResultSet row, int rowNum) throws SQLException {
