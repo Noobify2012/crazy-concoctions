@@ -11,4 +11,5 @@ public interface CommentRepo {
   List<Comment> getCommentsByDrinkId(long drinkId);
   List<Comment> getCommentsByUserId(long userId);
   Optional<Comment> getCommentById(long commentId);
+  int deleteByID(long commentId);
 }

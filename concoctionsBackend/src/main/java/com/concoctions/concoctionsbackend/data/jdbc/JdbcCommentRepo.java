@@ -54,6 +54,14 @@ public class JdbcCommentRepo implements CommentRepo {
         .findFirst();
   }
 
+  @Override
+  public int deleteByID(long commentId) {
+    return jdbcTemplate.update(
+        "delete from comment where commentId = ?",
+        commentId
+    );
+  }
+
   private Comment mapRowToComment(ResultSet row, int rowNum)
       throws SQLException
   {
