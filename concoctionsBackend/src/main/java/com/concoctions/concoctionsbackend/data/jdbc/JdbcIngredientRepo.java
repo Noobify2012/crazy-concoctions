@@ -2,8 +2,8 @@ package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.IngredientRepo;
 import com.concoctions.concoctionsbackend.data.TypeRepo;
-import com.concoctions.concoctionsbackend.model.Ingredient;
-import com.concoctions.concoctionsbackend.model.Type;
+import com.concoctions.concoctionsbackend.dto.Ingredient;
+import com.concoctions.concoctionsbackend.dto.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -34,7 +34,7 @@ public class JdbcIngredientRepo implements IngredientRepo {
         (row, rowNum) -> {
           long typeID = row.getLong("typeID");
           Type type = types.stream()
-              .filter(t -> t.getTypID() == typeID)
+              .filter(t -> t.getTypeID() == typeID)
               .findFirst()
               .orElse(null);
           // todo make sure to actually throw an error here.
@@ -49,12 +49,19 @@ public class JdbcIngredientRepo implements IngredientRepo {
   }
 
   @Override
-  public Optional<Ingredient> getIngredientById(long id) {
+  public Optional<Ingredient> getIngredientById(long ingredientId) {
     return jdbcTemplate.query(
         "select * from ingredient where ingredientId = ?",
         this::mapRowToIngredient,
-        id).stream()
+            ingredientId).stream()
         .findFirst();
+  }
+
+  @Override
+  public int deleteIngredientById(long ingredientId) {
+    return jdbcTemplate.update(
+        "delete from ingredient where ingredientId = ?",
+        ingredientId);
   }
 
   private Ingredient mapRowToIngredient(ResultSet row, int rowNum)

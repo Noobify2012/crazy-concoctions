@@ -1,6 +1,6 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.model.Comment;
+import com.concoctions.concoctionsbackend.dto.Comment;
 
 import java.util.List;
 import java.util.Optional;

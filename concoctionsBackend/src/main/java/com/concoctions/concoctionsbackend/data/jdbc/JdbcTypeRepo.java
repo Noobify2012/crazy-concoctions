@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.TypeRepo;
-import com.concoctions.concoctionsbackend.model.Type;
+import com.concoctions.concoctionsbackend.dto.Type;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -30,11 +30,11 @@ public class JdbcTypeRepo implements TypeRepo {
   }
 
   @Override
-  public Optional<Type> getTypeById(long id) {
+  public Optional<Type> getTypeById(long typeId) {
     return jdbcTemplate.query(
         "select * from type where typeId = ?",
         this::mapRowToType,
-        id).stream()
+            typeId).stream()
         .findFirst();
 
   }
@@ -46,6 +46,15 @@ public class JdbcTypeRepo implements TypeRepo {
         this::mapRowToType,
         name).stream()
         .findFirst();
+  }
+
+  @Override
+  public int deleteById(long typeId) {
+    return jdbcTemplate.update(
+        "delete from type where typeId = ?",
+        typeId
+    );
+
   }
 
   private Type mapRowToType(ResultSet row, int rowNum) throws SQLException {

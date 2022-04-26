@@ -4,7 +4,7 @@ import com.concoctions.concoctionsbackend.data.CategoryRepo;
 import com.concoctions.concoctionsbackend.data.DrinkIngredientRepo;
 import com.concoctions.concoctionsbackend.data.DrinkRepo;
 import com.concoctions.concoctionsbackend.data.FoodItemRepo;
-import com.concoctions.concoctionsbackend.model.Drink;
+import com.concoctions.concoctionsbackend.dto.Drink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -44,14 +44,20 @@ public class JdbcDrinkRepo implements DrinkRepo {
   }
 
   @Override
-  public Optional<Drink> findDrinkById(Long id) {
+  public Optional<Drink> findDrinkById(long drinkId) {
     return jdbcTemplate.query(
         "select * from drink where drinkId = ?",
         this::mapRowToDrink,
-        id).stream()
+        drinkId).stream()
         .findFirst();
   }
 
+  @Override
+  public int deleteDrinkById(long drinkId) {
+    return jdbcTemplate.update(
+        "delete from drink where drinkId = ?",
+        drinkId);
+  }
 
   private Drink mapRowToDrink(ResultSet row, int rowNum) throws SQLException {
     return Drink.builder()

@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.UomRepo;
-import com.concoctions.concoctionsbackend.model.UnitOfMeasure;
+import com.concoctions.concoctionsbackend.dto.UnitOfMeasure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -31,11 +31,11 @@ public class JdbcUomRepo implements UomRepo {
   }
 
   @Override
-  public Optional<UnitOfMeasure> getUomById(long id) {
+  public Optional<UnitOfMeasure> getUomById(long uomId) {
     return jdbcTemplate.query(
         "select * from unitOfMeasure where uomId = ?",
         this::mapRowToUom,
-        id).stream()
+            uomId).stream()
         .findFirst();
   }
 
@@ -46,6 +46,14 @@ public class JdbcUomRepo implements UomRepo {
         this::mapRowToUom,
         name).stream()
         .findFirst();
+  }
+
+  @Override
+  public int deleteUomById(long uomId) {
+    return jdbcTemplate.update(
+        "delete from unitOfMeasure where uomId = ?",
+        uomId);
+
   }
 
   private UnitOfMeasure mapRowToUom(ResultSet row, int rowNum)

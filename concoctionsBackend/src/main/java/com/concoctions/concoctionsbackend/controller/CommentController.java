@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.CommentRepo;
-import com.concoctions.concoctionsbackend.model.Comment;
+import com.concoctions.concoctionsbackend.dto.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

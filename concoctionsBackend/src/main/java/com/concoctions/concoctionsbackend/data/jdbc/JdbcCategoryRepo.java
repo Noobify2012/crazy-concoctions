@@ -1,7 +1,7 @@
 package com.concoctions.concoctionsbackend.data.jdbc;
 
 import com.concoctions.concoctionsbackend.data.CategoryRepo;
-import com.concoctions.concoctionsbackend.model.Category;
+import com.concoctions.concoctionsbackend.dto.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -31,12 +31,19 @@ public class JdbcCategoryRepo implements CategoryRepo {
   }
 
   @Override
-  public Optional<Category> getCategoryById(long id) {
+  public Optional<Category> getCategoryById(long categoryId) {
     return jdbcTemplate.query(
         "select * from category where categoryId = ?",
         this::mapRowToCategory,
-        id).stream()
+            categoryId).stream()
         .findFirst();
+  }
+
+  @Override
+  public int deleteCategoryById(long categoryId) {
+    return jdbcTemplate.update(
+        "delete from category where categoryId = ?",
+        categoryId);
   }
 
   private Category mapRowToCategory(ResultSet row, int rowNum)

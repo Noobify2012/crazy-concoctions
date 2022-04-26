@@ -1,6 +1,6 @@
 package com.concoctions.concoctionsbackend.data;
 
-import com.concoctions.concoctionsbackend.model.User;
+import com.concoctions.concoctionsbackend.dto.User;
 
 import java.util.List;
 import java.util.Optional;
