@@ -60,6 +60,14 @@ public class JdbcUserRepo implements UserRepo {
     );
   }
 
+  @Override
+  public int deleteById(long id) {
+    return jdbcTemplate.update(
+        "delete from user where userId = ?",
+        id
+    );
+  }
+
   private User mapRowToUser(ResultSet row, int rowNum) throws SQLException {
     return User.builder()
         .userId(row.getLong("userId"))

@@ -12,4 +12,11 @@ public interface UserRepo {
   Optional<User> findUserByEmail(String email);
 
   int save(User user);
+  // todo this should not return int (the affected rows) but probably the newly
+  // created user.
+
+  int deleteById(long id);
+  // todo should this return int (the affected rows)?
+
+
 }

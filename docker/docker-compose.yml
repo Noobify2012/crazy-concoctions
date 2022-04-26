@@ -16,5 +16,5 @@ services:
       - "6603:3306"
     volumes:
       - ./concoctions.sql:/concoctions
-      - ./01_init.sql
-      - ./02_starterData.sql
+        #- ./01_init.sql
+        #- ./02_starterData.sql
