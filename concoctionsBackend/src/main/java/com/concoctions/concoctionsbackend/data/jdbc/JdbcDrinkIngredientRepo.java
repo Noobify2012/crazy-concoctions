@@ -70,7 +70,7 @@ public class JdbcDrinkIngredientRepo implements DrinkIngredientRepo {
   {
     return new DrinkIngredient(
         // todo make sure to actually throw an error here and not just pass null
-        uomRepo.getUomById(row.getLong("uomId"))
+        uomRepo.getById(row.getLong("uomId"))
             .orElse(null),
         ingredientRepo.getById(row.getLong("ingredientId"))
             .orElse(null),

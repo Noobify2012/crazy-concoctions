@@ -12,5 +12,6 @@ public interface TypeRepo {
   Optional<Type> getById(long typeId);
   Optional<Type> getByName(String name);
   Optional<Type> save(TypeDto typeDto);
+  Optional<Type> update(Type type);
   int deleteById(long typeId);
 }

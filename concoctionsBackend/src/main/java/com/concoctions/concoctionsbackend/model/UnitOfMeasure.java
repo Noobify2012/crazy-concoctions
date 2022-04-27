@@ -9,4 +9,5 @@ public class UnitOfMeasure {
   private long uomId;
   private String name;
   private String type;
+
 }

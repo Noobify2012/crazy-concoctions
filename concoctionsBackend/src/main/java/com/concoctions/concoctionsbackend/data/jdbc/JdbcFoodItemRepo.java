@@ -21,18 +21,18 @@ import java.util.Optional;
 public class JdbcFoodItemRepo implements FoodItemRepo {
 
   private final JdbcTemplate jdbcTemplate;
-  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+//  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private final SimpleJdbcInsert simpleJdbcInsertFoodItem;
   private final SimpleJdbcInsert simpleJdbcInsertPairing;
 
   @Autowired
   public JdbcFoodItemRepo(
       JdbcTemplate jdbcTemplate,
-      NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+//      NamedParameterJdbcTemplate namedParameterJdbcTemplate,
       DataSource dataSource
   ) {
     this.jdbcTemplate = jdbcTemplate;
-    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+//    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     this.simpleJdbcInsertFoodItem = new SimpleJdbcInsert(dataSource)
         .withTableName("foodItem")
         .usingGeneratedKeyColumns("foodItemId");
@@ -51,7 +51,8 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   @Override
   public List<FoodItem> getAllByDrinkId(long drinkId) {
     return jdbcTemplate.query(
-        "select foodItem.* from foodItem JOIN pairing using (foodItemId) where drinkId = ?",
+        "select foodItem.* from foodItem JOIN pairing using (foodItemId) "
+        + " where drinkId = ?",
         this::mapRowToFoodItems,
         drinkId);
   }

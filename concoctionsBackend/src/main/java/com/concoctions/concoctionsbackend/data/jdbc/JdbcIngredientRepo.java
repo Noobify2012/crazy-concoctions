@@ -47,7 +47,7 @@ public class JdbcIngredientRepo implements IngredientRepo {
         (row, rowNum) -> {
           long typeID = row.getLong("typeID");
           Type type = types.stream()
-              .filter(t -> t.getTypeID() == typeID)
+              .filter(t -> t.getTypeId() == typeID)
               .findFirst()
               .orElse(null);
           // todo make sure to actually throw an error here.
