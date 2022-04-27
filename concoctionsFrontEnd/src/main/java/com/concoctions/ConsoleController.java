@@ -344,7 +344,7 @@ public class ConsoleController implements Controller {
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
-        //System.out.println("Before parsing: " + response.body());
+        System.out.println("Before parsing: " + response.body());
         try {
             JSONArray drinkJson = new JSONArray(drinkstring);
 //            JSONArray drinkJson = parser.parse(drinkstring);
