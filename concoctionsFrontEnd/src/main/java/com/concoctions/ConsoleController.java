@@ -91,8 +91,8 @@ public class ConsoleController implements Controller {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        System.out.println(response.body());
+//        System.out.println(response.statusCode());
+//        System.out.println(response.body());
 
         if (response.statusCode() != 200) {
             System.out.println("It looks there was an issue getting registered, try again");
