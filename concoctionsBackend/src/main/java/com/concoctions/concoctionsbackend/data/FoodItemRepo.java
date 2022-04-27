@@ -8,9 +8,10 @@ import java.util.Optional;
 
 public interface FoodItemRepo {
   List<FoodItem> getAll();
-  List<FoodItem> getAllByDrinkId(long foodItemId);
+  List<FoodItem> getAllByDrinkId(long drinkId);
   Optional<FoodItem> getById(long foodItemId);
   Optional<FoodItem> save(FoodItemDto foodItemDto);
+  List<FoodItem> saveAllByDrinkId(long drinkId, List<Long> foodItemIds);
   int deleteFoodItemById(long foodItemId);
 
 }

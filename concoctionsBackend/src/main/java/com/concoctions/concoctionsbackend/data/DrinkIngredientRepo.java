@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface DrinkIngredientRepo {
   List<DrinkIngredient> getAllForDrinkId(long id);
-  List<DrinkIngredient> saveAll(List<DrinkIngredientDto> drinkIngredientDtos);
+  List<DrinkIngredient> saveAll(long drinkId, List<DrinkIngredientDto> drinkIngredientDtos);
 
 }
