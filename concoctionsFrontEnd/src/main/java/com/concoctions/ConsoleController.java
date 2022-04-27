@@ -1,10 +1,9 @@
 package com.concoctions;
 
-import com.concoctions.concoctionsbackend.model.Drink;
-import com.sun.source.tree.WhileLoopTree;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -13,8 +12,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -32,6 +32,8 @@ public class ConsoleController implements Controller {
 
     private JSONParser parser;
 
+    private ObjectMapper mapper;
+
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
             throw new IllegalArgumentException("Readable and Appendable can't be null");
@@ -40,6 +42,7 @@ public class ConsoleController implements Controller {
         this.scan = new Scanner(in);
         this.client = client;
         parser = new JSONParser();
+        mapper = new ObjectMapper();
     }
 
     protected String getUserInput() {
@@ -344,7 +347,9 @@ public class ConsoleController implements Controller {
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
-        System.out.println("Before parsing: " + response.body());
+        JsonNode node = mapper.readTree(drinkstring);
+//        System.out.println("Value of node: " + node);
+//        System.out.println("Before parsing: " + response.body());
         try {
             JSONArray drinkJson = new JSONArray(drinkstring);
 //            JSONArray drinkJson = parser.parse(drinkstring);
@@ -355,10 +360,20 @@ public class ConsoleController implements Controller {
                     String U = currDrink.getString("userId");
                     String N = currDrink.getString("name");
                     String C = currDrink.getString("category");
-                    String T = currDrink.getString("name");
+//                    System.out.println("Value of C before unpack: " + C);
+                    C = unpack(C);
+//                    System.out.println("Value of C after unpack: " + C);
+//                    String T = currDrink.getString("name");
                     String DE = currDrink.getString("description");
+                    String DI = currDrink.getString("drinkIngredients");
+//                    System.out.println("before unpacking array before unpacking: " +  DI);
+                    DI = unpackArray(DI);
+//                    System.out.println("after unpacking array before unpacking: " +  DI);
+                    DI = unpack(DI);
+//                    System.out.println("after unpacking array after unpacking: " +  DI);
+
 //                    String CI = currDrink.getString("categoryId");
-                    System.out.println(D + " " + U + " " + N + " " + C + " " + T + " " + DE + " "  + "\n");
+                    System.out.println("Drink ID: " + D + " User ID: " + U + " Drink Name: " + N + " Drink Category: " + C + " Type Name: " + " Type Description: " + DE + "\nDrink Ingredients: " + DI + "\n");
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -377,6 +392,48 @@ public class ConsoleController implements Controller {
             mainMenu();
         }
     }
+
+    private String unpack(String string) throws JSONException {
+        org.json.JSONObject unpacked = new org.json.JSONObject(string);
+//        System.out.println("Value of unpacked: " + unpacked);
+        String outbound = "";
+        Map<Object,Object> unpackedMap = new HashMap<>();
+        unpacked.keys().forEachRemaining(key -> {
+            Object value = null;
+            try {
+                value = unpacked.get((String) key);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            unpackedMap.put(key, value);
+//            System.out.println("nested objects key: " + key + " value: " + value + "\n");
+                });
+//        for (int i = 0; i < unpacked.keys(); i++) {
+//            outbound += unpacked.toString(i) + "\n";
+//        }
+        for (Object key: unpackedMap.keySet()) {
+            outbound += " " + key + ": " + unpackedMap.get(key) + "\n";
+            //System.out.println("Current key value pair: " + key + " " + unpackedMap.get(key));
+        }
+        return outbound;
+//        return outbound;
+    }
+
+    private String unpackArray (String string) throws JSONException, IOException, InterruptedException {
+        JSONArray array = new JSONArray(string);
+        String outbound = "";
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                org.json.JSONObject currDrink = array.getJSONObject(i);
+                outbound += currDrink  + "\n";
+
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+
+    }
+        return outbound;}
 
     /**
      *
