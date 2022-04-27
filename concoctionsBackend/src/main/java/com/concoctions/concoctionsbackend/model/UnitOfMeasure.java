@@ -1,5 +1,6 @@
 package com.concoctions.concoctionsbackend.model;
 
+import com.concoctions.concoctionsbackend.dto.UomDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

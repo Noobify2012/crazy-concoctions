@@ -12,6 +12,7 @@ public interface UomRepo {
   Optional<UnitOfMeasure> getById(long uomId);
   Optional<UnitOfMeasure> getByName(String name);
   Optional<UnitOfMeasure> save(UomDto uomDto);
+  Optional<UnitOfMeasure> update(long uomId, UomDto uomDto);
   int deleteById(long uomId);
 
 }

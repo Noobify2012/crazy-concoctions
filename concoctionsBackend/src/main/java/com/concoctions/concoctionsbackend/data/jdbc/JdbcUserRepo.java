@@ -57,11 +57,11 @@ public class JdbcUserRepo implements UserRepo {
   }
 
   @Override
-  public Optional<User> getById(long id) {
+  public Optional<User> getById(long userId) {
     return jdbcTemplate.query(
         "select * from user where userId = ?",
         this::mapRowToUser,
-        id).stream()
+            userId).stream()
         .findFirst();
   }
 
@@ -86,7 +86,27 @@ public class JdbcUserRepo implements UserRepo {
 
     Number key = simpleJdbcInsert.executeAndReturnKey(params);
     return this.getById(key.longValue()).stream().findFirst();
+  }
 
+  @Override
+  public Optional<User> update(long userId, UserDto userDto) {
+    String update = "update user set email = :email, username = :username, password = :password, "
+        + "firstName = :firstName, lastName = :lastName, bio = :bio where userId = :userId";
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("userId", userId)
+        .addValue("email", userDto.getEmail())
+        .addValue("username", userDto.getUsername())
+        .addValue("password", userDto.getPassword())
+        .addValue("firstName", userDto.getFirstName())
+        .addValue("lastName", userDto.getLastName())
+        .addValue("bio", userDto.getBio());
+
+    int numChanged = namedParameterJdbcTemplate.update(update, params);
+    if (numChanged > 0) {
+      return this.getById(userId);
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Override
@@ -102,7 +122,7 @@ public class JdbcUserRepo implements UserRepo {
         .userId(row.getLong("userId"))
         .email(row.getString("email"))
         .username(row.getString("username"))
-//        .password(row.getString("password"))
+        .password(row.getString("password"))
         .firstName(row.getString("firstName"))
         .lastName(row.getString("lastName"))
         .bio(row.getString("bio"))

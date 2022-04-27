@@ -78,16 +78,18 @@ public class JdbcTypeRepo implements TypeRepo {
   }
 
   @Override
-  public Optional<Type> update(Type type) {
+  public Optional<Type> update(long typeId, TypeDto typeDto) {
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("name", typeDto.getName())
+        .addValue("description", typeDto.getDescription())
+        .addValue("typeId", typeId);
     // https://www.baeldung.com/spring-jdbc-jdbctemplate
     String update = "update type set name = :name, description = :description "
         + "where typeId = :typeId";
-    SqlParameterSource params = new BeanPropertySqlParameterSource(type);
 
     int numChanged = namedParameterJdbcTemplate.update(update, params);
-
     if (numChanged > 0) {
-      return this.getById(type.getTypeId());
+      return this.getById(typeId);
     } else {
       return Optional.empty();
     }

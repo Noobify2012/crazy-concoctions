@@ -72,19 +72,20 @@ public class TypeController {
       @PathVariable long typeId,
       @RequestBody TypeDto typeDto
   ){
-    Optional<Type> type = typeRepo.getById(typeId);
+
+    Optional<Type> type = typeRepo.update(typeId, typeDto);
 
 
-    if (type.isEmpty()) {
-      //todo really should get better error handling when not found
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-
-    if (!type.get().update(typeDto)) {
-      //todo really should get better error handling when no update
-      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(null);
-    }
-    type = typeRepo.update(type.get());
+//    if (type.isEmpty()) {
+//      //todo really should get better error handling when not found
+//      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//    }
+//
+//    if (!type.get().update(typeDto)) {
+//      //todo really should get better error handling when no update
+//      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(null);
+//    }
+//    type = typeRepo.update(type.get());
     return type.map(value -> ResponseEntity
             .ok()
             .body(value))

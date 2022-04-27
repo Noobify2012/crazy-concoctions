@@ -1,5 +1,6 @@
 package com.concoctions.concoctionsbackend.model;
 
+import com.concoctions.concoctionsbackend.dto.IngredientDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class Ingredient {
   private Type type;
   private String description;
   private boolean isAlcoholic;
+
 }

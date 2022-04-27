@@ -13,19 +13,19 @@ public class Type {
   private String description;
 
 
-  public boolean update(TypeDto typeDto) {
-    boolean updated = false;
-
-    if (typeDto.getName() != null) {
-      this.setName(typeDto.getName());
-      updated = true;
-    }
-    if (typeDto.getDescription() != null) {
-      this.setDescription(typeDto.getDescription());
-      updated = true;
-    }
-
-    return updated;
-  }
+//  public boolean update(TypeDto typeDto) {
+//    boolean updated = false;
+//
+//    if (typeDto.getName() != null) {
+//      this.setName(typeDto.getName());
+//      updated = true;
+//    }
+//    if (typeDto.getDescription() != null) {
+//      this.setDescription(typeDto.getDescription());
+//      updated = true;
+//    }
+//
+//    return updated;
+//  }
 
 }

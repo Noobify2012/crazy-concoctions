@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,13 +36,15 @@ public class DrinkController {
     return drinkRepo.getAll();
   }
 
+  //todo change this to take a path variable
   @GetMapping("/find")
   public ResponseEntity<Drink> findDrinkById(
       @RequestParam Long id
   ){
     Optional<Drink> drink = drinkRepo.getById(id);
-    return drink
-        .map(ResponseEntity::ok)
+    return drink.map(value -> ResponseEntity
+            .ok()
+            .body(value))
         .orElseGet(() -> ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(null)
@@ -53,6 +56,21 @@ public class DrinkController {
       @RequestBody DrinkDto drinkDto
   ) {
     Optional<Drink> drink = drinkRepo.save(drinkDto);
+    return drink.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
+  }
+
+  @PatchMapping("/update/{drinkId}")
+  public ResponseEntity<Drink> updateDrink(
+      @PathVariable long drinkId,
+      @RequestBody DrinkDto drinkDto
+  ){
+    Optional<Drink> drink = drinkRepo.update(drinkId, drinkDto);
     return drink.map(value -> ResponseEntity
             .ok()
             .body(value))

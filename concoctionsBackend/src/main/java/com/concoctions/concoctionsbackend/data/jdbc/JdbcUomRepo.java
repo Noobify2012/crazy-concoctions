@@ -6,6 +6,7 @@ import com.concoctions.concoctionsbackend.model.UnitOfMeasure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -20,16 +21,20 @@ import java.util.Optional;
 public class JdbcUomRepo implements UomRepo {
 
   private final JdbcTemplate jdbcTemplate;
+  private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
   private final SimpleJdbcInsert simpleJDbcInsert;
 
   @Autowired
   public JdbcUomRepo(
       JdbcTemplate jdbcTemplate,
+      NamedParameterJdbcTemplate namedParameterJdbcTemplate,
       DataSource dataSource
   ) {
     this.jdbcTemplate = jdbcTemplate;
+    this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     this.simpleJDbcInsert = new SimpleJdbcInsert(dataSource)
-        .withTableName("unitOfMeasure");
+        .withTableName("unitOfMeasure")
+        .usingGeneratedKeyColumns("uomId");
   }
 
 
@@ -57,6 +62,22 @@ public class JdbcUomRepo implements UomRepo {
         this::mapRowToUom,
         name).stream()
         .findFirst();
+  }
+
+  @Override
+  public Optional<UnitOfMeasure> update(long uomId, UomDto uomDto) {
+    String update = "update unitOfMeasure set name = :name, type = :type where "
+        + "uomId = :uomId";
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("uomId", uomId)
+        .addValue("name", uomDto.getName())
+        .addValue("type", uomDto.getType());
+    int numChanged = namedParameterJdbcTemplate.update(update, params);
+    if (numChanged > 0) {
+      return this.getById(uomId);
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Override

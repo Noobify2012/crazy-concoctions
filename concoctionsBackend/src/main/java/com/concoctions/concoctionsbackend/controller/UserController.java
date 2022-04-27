@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -64,6 +66,21 @@ public class UserController {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(null));
   }
+
+  @PatchMapping("/update/{userId}")
+  public ResponseEntity<User> patchUser(
+      @PathVariable long userId,
+      @RequestBody UserDto userDto
+  ){
+    Optional<User> user = userRepo.update(userId, userDto);
+    return user.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null));
+  }
+
 
   @DeleteMapping("/delete/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
