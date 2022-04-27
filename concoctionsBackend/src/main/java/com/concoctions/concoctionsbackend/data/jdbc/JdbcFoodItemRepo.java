@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,8 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-  private final SimpleJdbcInsert simpleJdbcInsert;
+  private final SimpleJdbcInsert simpleJdbcInsertFoodItem;
+  private final SimpleJdbcInsert simpleJdbcInsertPairing;
 
   @Autowired
   public JdbcFoodItemRepo(
@@ -32,9 +34,11 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   ) {
     this.jdbcTemplate = jdbcTemplate;
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+    this.simpleJdbcInsertFoodItem = new SimpleJdbcInsert(dataSource)
         .withTableName("foodItem")
         .usingGeneratedKeyColumns("foodItemId");
+    this.simpleJdbcInsertPairing = new SimpleJdbcInsert(dataSource)
+        .withTableName("pairing");
   }
 
   @Override
@@ -46,21 +50,12 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public List<FoodItem> getAllByDrinkId(long foodItemId) {
-    List<Long> foodItemIds = jdbcTemplate.query(
-        "select foodItemId from pairing where drinkId = ?",
-        (row, rowNum) -> row.getLong("foodItemId"),
-        foodItemId);
-
-    // https://www.baeldung.com/spring-jdbctemplate-in-list
-    SqlParameterSource parameters
-        = new MapSqlParameterSource("foodItemIds", foodItemIds);
-
-    return namedParameterJdbcTemplate.query(
-        "select * from foodItem where foodItemId in (:foodItemIds)",
-        parameters,
-        this::mapRowToFoodItems
-    );
+  public List<FoodItem> getAllByDrinkId(long drinkId) {
+    return jdbcTemplate.query(
+        "select foodItem.* from foodItem JOIN pairing using (foodItemId) "
+        + " where drinkId = ?",
+        this::mapRowToFoodItems,
+        drinkId);
   }
 
   @Override
@@ -77,13 +72,49 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
     SqlParameterSource params = new MapSqlParameterSource()
         .addValue("name", foodItemDto.getName());
 
-    Number key = simpleJdbcInsert.executeAndReturnKey(params);
+    Number key = simpleJdbcInsertFoodItem.executeAndReturnKey(params);
     return this.getById(key.longValue()).stream().findFirst();
-
   }
 
   @Override
-  public int deleteFoodItemById(long foodItemId) {
+  public Optional<FoodItem> update(long foodItemId, FoodItemDto foodItemDto) {
+    String update = "update foodItem set name = :name";
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("name", foodItemDto.getName());
+
+    int numChanged = namedParameterJdbcTemplate.update(update, params);
+    if (numChanged > 0) {
+      return this.getById(foodItemId);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public List<FoodItem> saveAllByDrinkId(long drinkId, List<Long> foodItemIds) {
+    MapSqlParameterSource[] paramsList = foodItemIds.stream()
+        .map(foodItemId -> new MapSqlParameterSource()
+            .addValue("drinkId", drinkId)
+            .addValue("foodItemID", foodItemId)
+        ).toArray(MapSqlParameterSource[]::new);
+    simpleJdbcInsertPairing.executeBatch(paramsList);
+    return this.getAllByDrinkId(drinkId);
+  }
+
+  @Override
+  public int deleteAllByDrinkId(long drinkId, List<Long> foodItemIds) {
+    MapSqlParameterSource[] paramsList = foodItemIds.stream()
+        .map(l -> new MapSqlParameterSource()
+            .addValue("foodItemId", l)
+            .addValue("drinkId", drinkId)
+        ).toArray(MapSqlParameterSource[]::new);
+    String update = "delete from pairing where drinkId = :drinkId and foodItemid = :foodItemId";
+    int[] numChanged = namedParameterJdbcTemplate.batchUpdate(update, paramsList);
+    return Arrays.stream(numChanged).sum();
+  }
+
+  @Override
+  public int deleteById(long foodItemId) {
     return jdbcTemplate.update(
         "delete from foodItem where foodItemId = ?",
         foodItemId);

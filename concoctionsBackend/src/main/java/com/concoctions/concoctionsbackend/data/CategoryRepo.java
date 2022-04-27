@@ -10,5 +10,6 @@ public interface CategoryRepo {
   List<Category> getAll();
   Optional<Category> getById(long categoryId);
   Optional<Category> save(CategoryDto categoryDto);
+  Optional<Category> update(long categoryId, CategoryDto categoryDto);
   int deleteCategoryById(long categoryId);
 }

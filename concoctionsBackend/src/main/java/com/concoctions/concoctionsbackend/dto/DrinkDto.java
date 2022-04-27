@@ -11,6 +11,6 @@ public class DrinkDto {
   private long categoryId;
   private boolean isHot;
   private String description;
-  private List<DrinkIngredientDto> drinkIngredientDtos;
+  private List<DrinkIngredientDto> drinkIngredients;
   private List<Long> foodItemIds;
 }
