@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +37,11 @@ public class DrinkController {
     return drinkRepo.getAll();
   }
 
-  //todo change this to take a path variable
-  @GetMapping("/find")
+  @GetMapping("/find/{drinkId}")
   public ResponseEntity<Drink> findDrinkById(
-      @RequestParam Long id
+      @PathVariable Long drinkId
   ){
-    Optional<Drink> drink = drinkRepo.getById(id);
+    Optional<Drink> drink = drinkRepo.getById(drinkId);
     return drink.map(value -> ResponseEntity
             .ok()
             .body(value))
@@ -49,6 +49,22 @@ public class DrinkController {
             .status(HttpStatus.NOT_FOUND)
             .body(null)
         );
+  }
+
+  @GetMapping("/find")
+  public ResponseEntity<List<Drink>> findDrinks(
+      @RequestParam(required = false) Long userId,
+      @RequestParam(required = false) Long categoryId
+  ){
+    List<Drink> drinks = List.of();
+    if (userId != null) {
+      drinks = drinkRepo.getAllByUserId(userId);
+    } else if (categoryId != null){
+      drinks = drinkRepo.getAlByCategoryId(categoryId);
+    } else {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.ok(drinks);
   }
 
   @PostMapping("/save")

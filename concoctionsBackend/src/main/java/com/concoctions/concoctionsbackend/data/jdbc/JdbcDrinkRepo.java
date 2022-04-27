@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Repository
 public class JdbcDrinkRepo implements DrinkRepo {
@@ -69,6 +68,22 @@ public class JdbcDrinkRepo implements DrinkRepo {
         this::mapRowToDrink,
         drinkId).stream()
         .findFirst();
+  }
+
+  @Override
+  public List<Drink> getAllByUserId(long userId) {
+    return jdbcTemplate.query(
+        "select * from drink where userId = ?",
+        this::mapRowToDrink,
+        userId);
+  }
+
+  @Override
+  public List<Drink> getAlByCategoryId(long categoryId) {
+    return jdbcTemplate.query(
+        "select * from drink where categoryId = ?",
+        this::mapRowToDrink,
+        categoryId);
   }
 
   @Override
