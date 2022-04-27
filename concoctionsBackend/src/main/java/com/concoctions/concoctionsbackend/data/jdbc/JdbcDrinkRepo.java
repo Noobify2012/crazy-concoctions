@@ -71,6 +71,14 @@ public class JdbcDrinkRepo implements DrinkRepo {
   }
 
   @Override
+  public List<Drink> getAllByName(String drinkName) {
+    return jdbcTemplate.query(
+        "select * from drink where name like ?",
+        this::mapRowToDrink,
+        drinkName);
+  }
+
+  @Override
   public List<Drink> getAllByUserId(long userId) {
     return jdbcTemplate.query(
         "select * from drink where userId = ?",

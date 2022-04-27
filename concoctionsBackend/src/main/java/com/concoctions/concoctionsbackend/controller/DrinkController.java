@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,13 +53,16 @@ public class DrinkController {
   @GetMapping("/find")
   public ResponseEntity<List<Drink>> findDrinks(
       @RequestParam(required = false) Long userId,
-      @RequestParam(required = false) Long categoryId
+      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) String drinkName
   ){
     List<Drink> drinks = List.of();
     if (userId != null) {
       drinks = drinkRepo.getAllByUserId(userId);
     } else if (categoryId != null){
       drinks = drinkRepo.getAlByCategoryId(categoryId);
+    } else if (drinkName != null) {
+      drinks = drinkRepo.getAllByName(drinkName);
     } else {
       return ResponseEntity.noContent().build();
     }
