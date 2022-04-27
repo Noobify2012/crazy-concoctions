@@ -1,18 +1,23 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.UomRepo;
+import com.concoctions.concoctionsbackend.dto.UomDto;
 import com.concoctions.concoctionsbackend.model.UnitOfMeasure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/uom")
@@ -27,7 +32,7 @@ public class UomController {
 
   @GetMapping("/all")
   public ResponseEntity<List<UnitOfMeasure>> getAllUom() {
-    List<UnitOfMeasure> uoms = uomRepo.getAllUoms();
+    List<UnitOfMeasure> uoms = uomRepo.getAll();
     return ResponseEntity.ok(uoms);
   }
 
@@ -35,7 +40,7 @@ public class UomController {
   public ResponseEntity<UnitOfMeasure> findUomById(
       @PathVariable long uomId
   ){
-    return uomRepo.getUomById(uomId)
+    return uomRepo.getById(uomId)
         .map(value -> ResponseEntity
             .ok()
             .body(value)
@@ -46,11 +51,40 @@ public class UomController {
         );
   }
 
+  @PostMapping("/save")
+  public ResponseEntity<UnitOfMeasure> saveUom(
+      @RequestBody UomDto uomDto
+  ){
+    Optional<UnitOfMeasure> uom = uomRepo.save(uomDto);
+    return uom.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
+  }
+
+  @PatchMapping("/update/{uomId}")
+  public ResponseEntity<UnitOfMeasure> patchUom(
+      @PathVariable long uomId,
+      @RequestBody UomDto uomDto
+  ){
+    Optional<UnitOfMeasure> uom = uomRepo.update(uomId, uomDto);
+    return uom.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
+  }
+
   @DeleteMapping("/delete/{uomId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUomById(
       @PathVariable long uomId
   ){
-    uomRepo.deleteUomById(uomId);
+    uomRepo.deleteById(uomId);
   }
 }

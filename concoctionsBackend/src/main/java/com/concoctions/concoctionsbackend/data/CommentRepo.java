@@ -13,5 +13,6 @@ public interface CommentRepo {
   List<Comment> getAllByUserId(long userId);
   Optional<Comment> getById(long commentId);
   Optional<Comment> save(CommentDto commentDto);
+  Optional<Comment> update(long commentId, CommentDto commentDto);
   int deleteByID(long commentId);
 }

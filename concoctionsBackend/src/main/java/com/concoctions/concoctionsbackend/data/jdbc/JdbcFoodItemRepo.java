@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,8 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   @Override
   public List<FoodItem> getAllByDrinkId(long drinkId) {
     return jdbcTemplate.query(
-        "select foodItem.* from foodItem JOIN pairing using (foodItemId) where drinkId = ?",
+        "select foodItem.* from foodItem JOIN pairing using (foodItemId) "
+        + " where drinkId = ?",
         this::mapRowToFoodItems,
         drinkId);
   }
@@ -75,6 +77,20 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
+  public Optional<FoodItem> update(long foodItemId, FoodItemDto foodItemDto) {
+    String update = "update foodItem set name = :name";
+    SqlParameterSource params = new MapSqlParameterSource()
+        .addValue("name", foodItemDto.getName());
+
+    int numChanged = namedParameterJdbcTemplate.update(update, params);
+    if (numChanged > 0) {
+      return this.getById(foodItemId);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
   public List<FoodItem> saveAllByDrinkId(long drinkId, List<Long> foodItemIds) {
     MapSqlParameterSource[] paramsList = foodItemIds.stream()
         .map(foodItemId -> new MapSqlParameterSource()
@@ -86,7 +102,19 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public int deleteFoodItemById(long foodItemId) {
+  public int deleteAllByDrinkId(long drinkId, List<Long> foodItemIds) {
+    MapSqlParameterSource[] paramsList = foodItemIds.stream()
+        .map(l -> new MapSqlParameterSource()
+            .addValue("foodItemId", l)
+            .addValue("drinkId", drinkId)
+        ).toArray(MapSqlParameterSource[]::new);
+    String update = "delete from pairing where drinkId = :drinkId and foodItemid = :foodItemId";
+    int[] numChanged = namedParameterJdbcTemplate.batchUpdate(update, paramsList);
+    return Arrays.stream(numChanged).sum();
+  }
+
+  @Override
+  public int deleteById(long foodItemId) {
     return jdbcTemplate.update(
         "delete from foodItem where foodItemId = ?",
         foodItemId);

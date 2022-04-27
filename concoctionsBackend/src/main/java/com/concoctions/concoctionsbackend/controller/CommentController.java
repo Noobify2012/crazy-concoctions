@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +74,20 @@ public class CommentController {
   ){
     return commentRepo.save(commentDto)
         .map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null));
+  }
+
+  @PatchMapping("/update/{commentId}")
+  public ResponseEntity<Comment> patchComment(
+      @PathVariable long commentId,
+      @RequestBody CommentDto commentDto
+  ){
+    Optional<Comment> comment = commentRepo.update(commentId, commentDto);
+    return comment.map(value -> ResponseEntity
             .ok()
             .body(value))
         .orElseGet(() -> ResponseEntity

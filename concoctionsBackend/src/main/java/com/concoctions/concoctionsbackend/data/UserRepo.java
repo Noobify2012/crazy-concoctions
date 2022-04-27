@@ -11,8 +11,9 @@ public interface UserRepo {
   Optional<User> findUserByUsernameAndPassword(String username, String password);
 
   List<User> getAll();
-  Optional<User> getById(long id);
+  Optional<User> getById(long userId);
   Optional<User> getByEmail(String email);
+  Optional<User> update(long userId, UserDto userDto);
   Optional<User> save(UserDto userDto);
   // todo this should not return int (the affected rows) but probably the newly
   // created user.

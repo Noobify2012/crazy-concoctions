@@ -11,7 +11,9 @@ public interface FoodItemRepo {
   List<FoodItem> getAllByDrinkId(long drinkId);
   Optional<FoodItem> getById(long foodItemId);
   Optional<FoodItem> save(FoodItemDto foodItemDto);
+  Optional<FoodItem> update(long foodItemId, FoodItemDto foodItemDto);
   List<FoodItem> saveAllByDrinkId(long drinkId, List<Long> foodItemIds);
-  int deleteFoodItemById(long foodItemId);
+  int deleteAllByDrinkId(long drinkId, List<Long> foodItemIds);
+  int deleteById(long foodItemId);
 
 }
