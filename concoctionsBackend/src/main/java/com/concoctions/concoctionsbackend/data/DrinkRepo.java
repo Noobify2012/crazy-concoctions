@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface DrinkRepo {
   List<Drink> getAll();
-  Optional<Drink> findById(long drinkId);
+  Optional<Drink> getById(long drinkId);
   Optional<Drink> save(DrinkDto drinkDto);
   int deleteDrinkById(long drinkId);
 }

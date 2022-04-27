@@ -1,6 +1,7 @@
 package com.concoctions.concoctionsbackend.controller;
 
 import com.concoctions.concoctionsbackend.data.DrinkRepo;
+import com.concoctions.concoctionsbackend.dto.DrinkDto;
 import com.concoctions.concoctionsbackend.model.Drink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class DrinkController {
   public ResponseEntity<Drink> findDrinkById(
       @RequestParam Long id
   ){
-    Optional<Drink> drink = drinkRepo.findById(id);
+    Optional<Drink> drink = drinkRepo.getById(id);
     return drink
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity
@@ -47,14 +48,18 @@ public class DrinkController {
         );
   }
 
-  @PostMapping
-  public ResponseEntity<Drink> createDrink(
-      @RequestBody Drink drink
+  @PostMapping("/save")
+  public ResponseEntity<Drink> saveDrink(
+      @RequestBody DrinkDto drinkDto
   ) {
-    return ResponseEntity
-        .status(HttpStatus.ACCEPTED)
-        .body(drink);
-    //todo you actually need to implement this shit. . .
+    Optional<Drink> drink = drinkRepo.save(drinkDto);
+    return drink.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
   }
 
   @DeleteMapping("/delete/{drinkId}")

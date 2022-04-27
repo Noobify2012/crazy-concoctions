@@ -22,7 +22,8 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-  private final SimpleJdbcInsert simpleJdbcInsert;
+  private final SimpleJdbcInsert simpleJdbcInsertFoodItem;
+  private final SimpleJdbcInsert simpleJdbcInsertPairing;
 
   @Autowired
   public JdbcFoodItemRepo(
@@ -32,9 +33,11 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   ) {
     this.jdbcTemplate = jdbcTemplate;
     this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+    this.simpleJdbcInsertFoodItem = new SimpleJdbcInsert(dataSource)
         .withTableName("foodItem")
         .usingGeneratedKeyColumns("foodItemId");
+    this.simpleJdbcInsertPairing = new SimpleJdbcInsert(dataSource)
+        .withTableName("pairing");
   }
 
   @Override
@@ -46,21 +49,11 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
   }
 
   @Override
-  public List<FoodItem> getAllByDrinkId(long foodItemId) {
-    List<Long> foodItemIds = jdbcTemplate.query(
-        "select foodItemId from pairing where drinkId = ?",
-        (row, rowNum) -> row.getLong("foodItemId"),
-        foodItemId);
-
-    // https://www.baeldung.com/spring-jdbctemplate-in-list
-    SqlParameterSource parameters
-        = new MapSqlParameterSource("foodItemIds", foodItemIds);
-
-    return namedParameterJdbcTemplate.query(
-        "select * from foodItem where foodItemId in (:foodItemIds)",
-        parameters,
-        this::mapRowToFoodItems
-    );
+  public List<FoodItem> getAllByDrinkId(long drinkId) {
+    return jdbcTemplate.query(
+        "select foodItem.* from foodItem JOIN pairing using (foodItemId) where drinkId = ?",
+        this::mapRowToFoodItems,
+        drinkId);
   }
 
   @Override
@@ -77,9 +70,19 @@ public class JdbcFoodItemRepo implements FoodItemRepo {
     SqlParameterSource params = new MapSqlParameterSource()
         .addValue("name", foodItemDto.getName());
 
-    Number key = simpleJdbcInsert.executeAndReturnKey(params);
+    Number key = simpleJdbcInsertFoodItem.executeAndReturnKey(params);
     return this.getById(key.longValue()).stream().findFirst();
+  }
 
+  @Override
+  public List<FoodItem> saveAllByDrinkId(long drinkId, List<Long> foodItemIds) {
+    MapSqlParameterSource[] paramsList = foodItemIds.stream()
+        .map(foodItemId -> new MapSqlParameterSource()
+            .addValue("drinkId", drinkId)
+            .addValue("foodItemID", foodItemId)
+        ).toArray(MapSqlParameterSource[]::new);
+    simpleJdbcInsertPairing.executeBatch(paramsList);
+    return this.getAllByDrinkId(drinkId);
   }
 
   @Override

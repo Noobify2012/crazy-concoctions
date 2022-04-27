@@ -6,6 +6,8 @@ import com.concoctions.concoctionsbackend.data.DrinkRepo;
 import com.concoctions.concoctionsbackend.data.FoodItemRepo;
 import com.concoctions.concoctionsbackend.dto.DrinkDto;
 import com.concoctions.concoctionsbackend.model.Drink;
+import com.concoctions.concoctionsbackend.model.DrinkIngredient;
+import com.concoctions.concoctionsbackend.model.FoodItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -54,7 +56,7 @@ public class JdbcDrinkRepo implements DrinkRepo {
   }
 
   @Override
-  public Optional<Drink> findById(long drinkId) {
+  public Optional<Drink> getById(long drinkId) {
     return jdbcTemplate.query(
         "select * from drink where drinkId = ?",
         this::mapRowToDrink,
@@ -71,7 +73,18 @@ public class JdbcDrinkRepo implements DrinkRepo {
         .addValue("isHot", drinkDto.isHot())
         .addValue("description", drinkDto.getDescription());
     Number key = simpleJdbcInsert.executeAndReturnKey(params);
-    return null;
+
+    List<DrinkIngredient> drinkIngredients =
+        drinkIngredientRepo.saveAll(
+            key.longValue(),
+            drinkDto.getDrinkIngredients()
+        );
+    List<FoodItem> foodItems =
+        foodItemRepo.saveAllByDrinkId(
+            key.longValue(),
+            drinkDto.getFoodItemIds()
+        );
+    return this.getById(key.longValue()).stream().findFirst();
   }
 
   @Override
