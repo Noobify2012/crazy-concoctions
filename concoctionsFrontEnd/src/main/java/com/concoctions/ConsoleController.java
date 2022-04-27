@@ -12,6 +12,8 @@ import java.net.http.HttpResponse;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import static java.lang.Integer.parseInt;
+
 public class ConsoleController implements Controller {
     /**
      *
@@ -198,8 +200,48 @@ public class ConsoleController implements Controller {
         if (response.statusCode() != 200) {
             System.out.println("It looks like we can't find you, try again");
             login();
+        } else {
+            mainMenu();
         }
 
+    }
+
+    protected void mainMenu() {
+
+        String userOption = "";
+        while (!userOption.equalsIgnoreCase("s") && !userOption.equalsIgnoreCase("n") && !userOption.equalsIgnoreCase("e") && !userOption.equalsIgnoreCase("c") && !userOption.equalsIgnoreCase("q")) {
+//            (parseInt(userOption) != 1 | parseInt(userOption) != 2 | parseInt(userOption) != 3 | parseInt(userOption) != 4 | parseInt(userOption) != 5) {
+            String menuString = "Concoctions Menu, Please select from one of the following options:\n S - Search for Drinks\n N - Create New Drinks\n E - Edit or remove your drinks\n C - Leave/Read Comments a Comment\n Q - Quit";
+            try {
+                //String element = scan.next();
+                out.append(menuString + "\n");
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Append failed", ioe);
+            }
+            userOption = getUserInput();
+            System.out.println(userOption);
+        }
+        if (userOption.equalsIgnoreCase("s")) {
+            getDrinks();
+        } else if (userOption.equalsIgnoreCase("n")) {
+            buildNewRecipe();
+        } else if (userOption.equalsIgnoreCase("e")) {
+            removeRecipe();
+        } else if (userOption.equalsIgnoreCase("c")) {
+            commentsMenU();
+        } else if (userOption.equalsIgnoreCase("q")) {
+            quit();
+        }
+    }
+
+    private void quit() {
+        String quitString = "Thank you for using concoctions";
+        try {
+            out.append(quitString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        System.exit(0);
     }
 
     /**
@@ -216,7 +258,14 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void buildNewRecipe() {
-
+        String drinkSearch = "Time to build some drinks";
+        try {
+            //String element = scan.next();
+            out.append(drinkSearch + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
     }
 
     /**
@@ -224,7 +273,14 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void removeRecipe() {
-
+        String drinkSearch = "Time to remove some drinks";
+        try {
+            //String element = scan.next();
+            out.append(drinkSearch + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
     }
 
     /**
@@ -232,7 +288,79 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void getDrinks() {
+        String drinkSearch = "Time to search for some drinks";
+        try {
+            //String element = scan.next();
+            out.append(drinkSearch + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
+    }
 
+    /**
+     *
+     */
+    @Override
+    public void editRecipe() {
+        String drinkSearch = "Time to edit some drinks ";
+        try {
+            //String element = scan.next();
+            out.append(drinkSearch + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
+    }
+
+    protected void commentsMenU() {
+        String userOption = "";
+        while (!userOption.equalsIgnoreCase("r") && !userOption.equalsIgnoreCase("l")) {
+            String menuString = "Comment Menu, Please select from one of the following options:\n R - Read Comments\n L - Leave a Comment";
+            try {
+                //String element = scan.next();
+                out.append(menuString + "\n");
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Append failed", ioe);
+            }
+            userOption = getUserInput();
+        }
+        if (userOption.equalsIgnoreCase("r")) {
+            readComments();
+        } else if (userOption.equalsIgnoreCase("l")) {
+            leaveComments();
+        }
+        mainMenu();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void readComments() {
+        String menuString = "read comments";
+        try {
+            //String element = scan.next();
+            out.append(menuString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void leaveComments() {
+        String menuString = "leave comments";
+        try {
+            //String element = scan.next();
+            out.append(menuString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        mainMenu();
     }
 
     public static boolean patternMatches(String userString, String regexPattern) {

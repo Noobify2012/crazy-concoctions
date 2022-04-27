@@ -16,6 +16,12 @@ public interface Controller {
 
     void getDrinks();
 
+    void editRecipe();
+
+    void readComments();
+
+    void leaveComments();
+
 
 
 }
