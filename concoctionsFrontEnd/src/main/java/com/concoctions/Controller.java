@@ -10,17 +10,17 @@ public interface Controller {
 
     void createProfile();
 
-    void buildNewRecipe();
+    void buildNewRecipe() throws IOException, InterruptedException;
 
-    void removeRecipe();
+    void removeRecipe() throws IOException, InterruptedException;
 
-    void getDrinks();
+    void getDrinks() throws IOException, InterruptedException;
 
-    void editRecipe();
+    void editRecipe() throws IOException, InterruptedException;
 
-    void readComments();
+    void readComments() throws IOException, InterruptedException;
 
-    void leaveComments();
+    void leaveComments() throws IOException, InterruptedException;
 
 
 

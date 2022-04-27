@@ -1,7 +1,11 @@
 package com.concoctions;
 
+import com.concoctions.concoctionsbackend.model.Drink;
 import com.sun.source.tree.WhileLoopTree;
 import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -9,6 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -24,6 +30,8 @@ public class ConsoleController implements Controller {
 
     private HttpClient client;
 
+    private JSONParser parser;
+
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
             throw new IllegalArgumentException("Readable and Appendable can't be null");
@@ -31,6 +39,7 @@ public class ConsoleController implements Controller {
         this.out = out;
         this.scan = new Scanner(in);
         this.client = client;
+        parser = new JSONParser();
     }
 
     protected String getUserInput() {
@@ -206,7 +215,7 @@ public class ConsoleController implements Controller {
 
     }
 
-    protected void mainMenu() {
+    protected void mainMenu() throws IOException, InterruptedException {
 
         String userOption = "";
         while (!userOption.equalsIgnoreCase("s") && !userOption.equalsIgnoreCase("n") && !userOption.equalsIgnoreCase("e") && !userOption.equalsIgnoreCase("c") && !userOption.equalsIgnoreCase("q")) {
@@ -219,7 +228,6 @@ public class ConsoleController implements Controller {
                 throw new IllegalStateException("Append failed", ioe);
             }
             userOption = getUserInput();
-            System.out.println(userOption);
         }
         if (userOption.equalsIgnoreCase("s")) {
             getDrinks();
@@ -257,7 +265,7 @@ public class ConsoleController implements Controller {
      *
      */
     @Override
-    public void buildNewRecipe() {
+    public void buildNewRecipe() throws IOException, InterruptedException {
         String drinkSearch = "Time to build some drinks";
         try {
             //String element = scan.next();
@@ -272,7 +280,7 @@ public class ConsoleController implements Controller {
      *
      */
     @Override
-    public void removeRecipe() {
+    public void removeRecipe() throws IOException, InterruptedException {
         String drinkSearch = "Time to remove some drinks";
         try {
             //String element = scan.next();
@@ -287,22 +295,94 @@ public class ConsoleController implements Controller {
      *
      */
     @Override
-    public void getDrinks() {
+    public void getDrinks() throws IOException, InterruptedException {
         String drinkSearch = "Time to search for some drinks";
+        String drinkDir = "drinks";
         try {
             //String element = scan.next();
             out.append(drinkSearch + "\n");
         } catch (IOException ioe) {
             throw new IllegalStateException("Append failed", ioe);
         }
+        String userOption = "";
+        while (!userOption.equalsIgnoreCase("a") && !userOption.equalsIgnoreCase("n") && !userOption.equalsIgnoreCase("i") && !userOption.equalsIgnoreCase("c")) {
+//            (parseInt(userOption) != 1 | parseInt(userOption) != 2 | parseInt(userOption) != 3 | parseInt(userOption) != 4 | parseInt(userOption) != 5) {
+            String menuString = "Drink Search, Please select from one of the following options:\n A - All Drinks\n N - Drinks by Name\n I - Drinks by UserId\n C - Drinks by Category";
+            try {
+                //String element = scan.next();
+                out.append(menuString + "\n");
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Append failed", ioe);
+            }
+            userOption = getUserInput();
+        }
+        if (userOption.equalsIgnoreCase("a")) {
+            getAllDrinks(drinkDir);
+        } else if (userOption.equalsIgnoreCase("n")) {
+            buildNewRecipe();
+        } else if (userOption.equalsIgnoreCase("i")) {
+            removeRecipe();
+        } else if (userOption.equalsIgnoreCase("c")) {
+            commentsMenU();
+        }
+
         mainMenu();
+    }
+
+    protected void getAllDrinks(String dir) throws IOException, InterruptedException {
+        String subDir = "all";
+//        JSONObject drinkObj = new JSONObject();
+//        System.out.println("login obj: " + loginObj.toString());
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
+                .header("Content-Type", "application/json")
+                .GET()
+//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+                .build();
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+        //System.out.println("Before parsing: " + response.body());
+        try {
+            JSONArray drinkJson = new JSONArray(drinkstring);
+//            JSONArray drinkJson = parser.parse(drinkstring);
+            for (int i = 0; i < drinkJson.length(); i++) {
+                try {
+                    org.json.JSONObject currDrink = drinkJson.getJSONObject(i);
+                    String D = currDrink.getString("drinkId");
+                    String U = currDrink.getString("userId");
+                    String N = currDrink.getString("name");
+                    String C = currDrink.getString("category");
+                    String T = currDrink.getString("name");
+                    String DE = currDrink.getString("description");
+//                    String CI = currDrink.getString("categoryId");
+                    System.out.println(D + " " + U + " " + N + " " + C + " " + T + " " + DE + " "  + "\n");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+//            Iterator<String> keys = drinkJson.;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        if (response.statusCode() != 200) {
+            System.out.println("It looks like we can't any drinks lets try again, try again");
+            getDrinks();
+        } else {
+            mainMenu();
+        }
     }
 
     /**
      *
      */
     @Override
-    public void editRecipe() {
+    public void editRecipe() throws IOException, InterruptedException {
         String drinkSearch = "Time to edit some drinks ";
         try {
             //String element = scan.next();
@@ -313,7 +393,7 @@ public class ConsoleController implements Controller {
         mainMenu();
     }
 
-    protected void commentsMenU() {
+    protected void commentsMenU() throws IOException, InterruptedException {
         String userOption = "";
         while (!userOption.equalsIgnoreCase("r") && !userOption.equalsIgnoreCase("l")) {
             String menuString = "Comment Menu, Please select from one of the following options:\n R - Read Comments\n L - Leave a Comment";
@@ -337,7 +417,7 @@ public class ConsoleController implements Controller {
      *
      */
     @Override
-    public void readComments() {
+    public void readComments() throws IOException, InterruptedException {
         String menuString = "read comments";
         try {
             //String element = scan.next();
@@ -352,7 +432,7 @@ public class ConsoleController implements Controller {
      *
      */
     @Override
-    public void leaveComments() {
+    public void leaveComments() throws IOException, InterruptedException {
         String menuString = "leave comments";
         try {
             //String element = scan.next();
