@@ -173,6 +173,19 @@ public class JdbcDrinkRepo implements DrinkRepo {
         drinkId);
   }
 
+  /**
+   * @param categoryName
+   * @return
+   */
+  @Override
+  public List<Drink> getByCategoryName(String categoryName) {
+    return jdbcTemplate.query(
+            "select * from drink join category using (categoryId) where category.name = ?",
+            this::mapRowToDrink,
+            categoryName);
+  }
+
+
   private Drink mapRowToDrink(ResultSet row, int rowNum) throws SQLException {
     return Drink.builder()
         .drinkId(row.getLong("drinkId"))

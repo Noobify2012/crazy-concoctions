@@ -87,6 +87,19 @@ public class JdbcCategoryRepo implements CategoryRepo {
         categoryId);
   }
 
+  /**
+   * @param name
+   * @return
+   */
+  @Override
+  public Optional<Category> getByName(String name) {
+    return jdbcTemplate.query(
+                    "select * from category where name = ?",
+                    this::mapRowToCategory,
+                    name).stream()
+            .findFirst();
+  }
+
   private Category mapRowToCategory(ResultSet row, int rowNum)
       throws SQLException
   {

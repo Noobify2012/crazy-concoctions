@@ -12,4 +12,5 @@ public interface CategoryRepo {
   Optional<Category> save(CategoryDto categoryDto);
   Optional<Category> update(long categoryId, CategoryDto categoryDto);
   int deleteCategoryById(long categoryId);
+  Optional<Category> getByName(String name);
 }

@@ -15,4 +15,6 @@ public interface DrinkRepo {
   Optional<Drink> save(DrinkDto drinkDto);
   Optional<Drink> update(long drinkId, DrinkDto drinkDto);
   int deleteDrinkById(long drinkId);
+
+  List<Drink> getByCategoryName(String categoryName);
 }

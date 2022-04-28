@@ -54,7 +54,8 @@ public class DrinkController {
   public ResponseEntity<List<Drink>> findDrinks(
       @RequestParam(required = false) Long userId,
       @RequestParam(required = false) Long categoryId,
-      @RequestParam(required = false) String drinkName
+      @RequestParam(required = false) String drinkName,
+      @RequestParam(required = false) String categoryName
   ){
     List<Drink> drinks = List.of();
     if (userId != null) {
@@ -63,6 +64,8 @@ public class DrinkController {
       drinks = drinkRepo.getAlByCategoryId(categoryId);
     } else if (drinkName != null) {
       drinks = drinkRepo.getAllByName(drinkName);
+    } else if (categoryName != null){
+      drinks = drinkRepo.getByCategoryName(categoryName);
     } else {
       return ResponseEntity.noContent().build();
     }

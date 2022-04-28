@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -239,7 +241,7 @@ public class ConsoleController implements Controller {
         } else if (userOption.equalsIgnoreCase("e")) {
             removeRecipe();
         } else if (userOption.equalsIgnoreCase("c")) {
-            commentsMenU();
+            commentsMenu();
         } else if (userOption.equalsIgnoreCase("q")) {
             quit();
         }
@@ -322,14 +324,148 @@ public class ConsoleController implements Controller {
         if (userOption.equalsIgnoreCase("a")) {
             getAllDrinks(drinkDir);
         } else if (userOption.equalsIgnoreCase("n")) {
-            buildNewRecipe();
+            getDrinksByName(drinkDir);
         } else if (userOption.equalsIgnoreCase("i")) {
-            removeRecipe();
+            getDrinksByID(drinkDir);
         } else if (userOption.equalsIgnoreCase("c")) {
-            commentsMenU();
+            getDrinksByCategory(drinkDir);
         }
 
         mainMenu();
+    }
+
+    protected void getDrinksByCategory(String dir) throws IOException, InterruptedException {
+        String userOption = "";
+        String menuString = "Please enter a category to search by";
+        try {
+            //String element = scan.next();
+            out.append(menuString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        userOption = getUserInput();
+        String subDir = "find";
+        URIBuilder ub;
+        try {
+            ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
+            ub.addParameter("categoryName", userOption);
+            String possibleOutput = ub.toString();
+            System.out.println("Possible output: " + possibleOutput);
+        } catch (URISyntaxException e) {
+            System.out.println("Threw URIexception ");
+            throw new RuntimeException(e);
+        }
+
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ub.toString()))
+                .header("Content-Type", "application/json")
+                .GET()
+//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+                .build();
+
+
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(request);
+//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+        System.out.println(drinkstring);
+    }
+
+    protected void getDrinksByID(String dir) throws IOException, InterruptedException {
+        String userOption = "";
+        String menuString = "Please enter a user ID to search by";
+        try {
+            //String element = scan.next();
+            out.append(menuString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        userOption = getUserInput();
+        String subDir = "find";
+        URIBuilder ub;
+        try {
+            ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
+            ub.addParameter("userId", userOption);
+            String possibleOutput = ub.toString();
+            System.out.println("Possible output: " + possibleOutput);
+        } catch (URISyntaxException e) {
+            System.out.println("Threw URIexception ");
+            throw new RuntimeException(e);
+        }
+
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ub.toString()))
+                .header("Content-Type", "application/json")
+                .GET()
+//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+                .build();
+
+
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(request);
+//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+        System.out.println(drinkstring);
+    }
+
+
+    protected void getDrinksByName(String dir) throws IOException, InterruptedException {
+        String userOption = "";
+        String menuString = "Please enter a drink name to search by";
+        try {
+            //String element = scan.next();
+            out.append(menuString + "\n");
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Append failed", ioe);
+        }
+        userOption = getUserInput();
+        JSONObject drinkObj = new JSONObject();
+        drinkObj.put("drinkName", userOption);
+        String subDir = "find";
+        System.out.println(drinkObj);
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?"))
+                .header("Content-Type", "application/json")
+//                .GET()
+
+                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+                .build();
+        System.out.println(subDir);
+
+        try {
+            URIBuilder ub = new URIBuilder("http://localhost:8080/");
+            ub.addParameter("drinkName", "espresso martini");
+            String possibleOutput = ub.toString();
+            System.out.println("Possible output: " + possibleOutput);
+        } catch (URISyntaxException e) {
+            System.out.println("Threw URIexception ");
+            throw new RuntimeException(e);
+        }
+
+
+        var request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?drinkName=" + userOption))
+                .header("Content-Type", "application/json")
+                .GET()
+//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+                .build();
+
+
+
+        var response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+        System.out.println(request2);
+//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response2.statusCode());
+        String drinkstring = response2.body();
+        System.out.println(drinkstring);
+
+
     }
 
     protected void getAllDrinks(String dir) throws IOException, InterruptedException {
@@ -431,7 +567,6 @@ public class ConsoleController implements Controller {
                 throw new RuntimeException(e);
             }
 
-
     }
         return outbound;}
 
@@ -450,7 +585,7 @@ public class ConsoleController implements Controller {
         mainMenu();
     }
 
-    protected void commentsMenU() throws IOException, InterruptedException {
+    protected void commentsMenu() throws IOException, InterruptedException {
         String userOption = "";
         while (!userOption.equalsIgnoreCase("r") && !userOption.equalsIgnoreCase("l")) {
             String menuString = "Comment Menu, Please select from one of the following options:\n R - Read Comments\n L - Leave a Comment";
