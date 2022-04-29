@@ -41,7 +41,7 @@ public class RequestBuilder implements Request {
         } else {
 
         }
-        return null;
+        return response;
     }
 
     /**
@@ -61,7 +61,7 @@ public class RequestBuilder implements Request {
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
-        return null;
+        return response;
     }
 
     /**

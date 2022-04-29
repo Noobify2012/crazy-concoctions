@@ -1,9 +1,17 @@
 package com.concoctions;
 
+import com.concoctions.menus.DrinkMenu;
+import com.concoctions.menus.DrinkMenuInt;
+import com.concoctions.model.Category;
+import com.concoctions.model.Drink;
+import com.concoctions.model.DrinkIngredient;
+import com.concoctions.model.FoodItem;
+import com.concoctions.model.Ingredient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,21 +28,29 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.List;
+
 import static java.lang.Integer.parseInt;
 
 public class ConsoleController implements Controller {
     /**
      *
      */
-
     private final Appendable out;
     private final Scanner scan;
-
     private HttpClient client;
-
-    private JSONParser parser;
-
     private ObjectMapper mapper;
+    private Gson gson;
+
+    private DrinkMenuInt DrinkMenu;
 
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
@@ -43,12 +59,13 @@ public class ConsoleController implements Controller {
         this.out = out;
         this.scan = new Scanner(in);
         this.client = client;
-        parser = new JSONParser();
         mapper = new ObjectMapper();
+        gson = new GsonBuilder().setPrettyPrinting().create();
+        DrinkMenu = new DrinkMenu();
     }
 
-    protected String getUserInput() {
-        String nextInput = scan.next();
+    private String getUserInput() {
+        String nextInput = scan.nextLine();
         if (nextInput.isEmpty()) {
             System.out.println("Please enter a value");
             getUserInput();
@@ -117,7 +134,7 @@ public class ConsoleController implements Controller {
     private JSONObject getNonEmptyField(JSONObject object, String field){
         String input = "";
         while(input.isEmpty()) {
-            System.out.println("Please enter a " + field + ", empty" + field + "s not allowed");
+            System.out.println("Please enter a " + field + ", empty " + field + "s not allowed");
             input = getUserInput();
         }
         object.put(field, input);
@@ -162,12 +179,6 @@ public class ConsoleController implements Controller {
     @Override
     public void start() throws IOException, InterruptedException, JSONException {
         getRegStatus();
-//        System.out.println("Are you a registered user? if yes enter y or yes, if no enter no or n");
-//        String registered = getUserInput();
-//
-//
-//        login();
-
     }
 
 
@@ -235,6 +246,7 @@ public class ConsoleController implements Controller {
             userOption = getUserInput();
         }
         if (userOption.equalsIgnoreCase("s")) {
+//            DrinkMenu.getDrinkSearch(scan);
             getDrinks();
         } else if (userOption.equalsIgnoreCase("n")) {
             buildNewRecipe();
@@ -489,7 +501,46 @@ public class ConsoleController implements Controller {
         try {
             JSONArray drinkJson = new JSONArray(drinkstring);
 //            JSONArray drinkJson = parser.parse(drinkstring);
+            // have to make this 'Type' class because of type erasure for generics in Java
+            Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+            List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
+            for (Drink d : drinkList) {
+                Long dID = d.getDrinkId();
+                Long userId = d.getUserId();
+                String name = d.getName();
+                Category category = d.getCategory();
+                String hotString;
+                boolean isHot = d.isHot();
+                if (isHot) {
+                    hotString = "Hot";
+                } else {
+                    hotString = "Cold";
+                }
+                String description = d.getDescription();
+                System.out.println("Drink ID: " + dID + "\nUser ID: " + userId + "\nDrink Name: " + name + "\nCategory: " + category.getName() + "\nHot or Cold: " + hotString + "\nDescription: " + description + "\nIngredients ");
+                List<DrinkIngredient> drinkIngredients = d.getDrinkIngredients();
+                for (DrinkIngredient di : drinkIngredients) {
+                    String alcString = "No";
+                    if (di.getIngredient().isAlcoholic()) {
+                        alcString = "Yes";
+                    }
+                    System.out.println("Ingredient: " + di.getIngredient().getName() + " description: " + di.getIngredient().getDescription() + " Contains Alcohol: " + alcString + " is this actually alcholic: " + di.getIngredient().isAlcoholic() + " " + di.getIngredient());
+                }
+                List<FoodItem> pairingsList = d.getPairings();
+                if (!pairingsList.isEmpty()) {
+                    System.out.println("Pairings: ");
+                    for (FoodItem pairing : pairingsList) {
+                        System.out.println(pairing.getName() + "\n");
+                    }
+                } else {
+                    System.out.println("");
+                }
+                //System.out.println(d);
+            }
+            String jsonDrinks = gson.toJson(drinkList);
             for (int i = 0; i < drinkJson.length(); i++) {
+//                Drink drink = gson.fromJson(response.body(), Drink.class);
+//                System.out.println("Current value of drink: " + drink);
                 try {
                     org.json.JSONObject currDrink = drinkJson.getJSONObject(i);
                     String D = currDrink.getString("drinkId");
@@ -509,7 +560,7 @@ public class ConsoleController implements Controller {
 //                    System.out.println("after unpacking array after unpacking: " +  DI);
 
 //                    String CI = currDrink.getString("categoryId");
-                    System.out.println("Drink ID: " + D + " User ID: " + U + " Drink Name: " + N + " Drink Category: " + C + " Type Name: " + " Type Description: " + DE + "\nDrink Ingredients: " + DI + "\n");
+                    //System.out.println("Drink ID: " + D + " User ID: " + U + " Drink Name: " + N + " Drink Category: " + C + " Type Name: " + " Type Description: " + DE + "\nDrink Ingredients: " + DI + "\n");
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
