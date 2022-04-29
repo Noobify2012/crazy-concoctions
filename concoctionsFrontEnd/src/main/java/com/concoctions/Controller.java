@@ -8,7 +8,7 @@ public interface Controller {
     void start() throws IOException, InterruptedException, JSONException;
     void login() throws IOException, InterruptedException, JSONException;
 
-    void createProfile();
+//    void createProfile();
 
     void buildNewRecipe() throws IOException, InterruptedException;
 
@@ -21,6 +21,12 @@ public interface Controller {
     void readComments() throws IOException, InterruptedException;
 
     void leaveComments() throws IOException, InterruptedException;
+
+//    Long getUserID();
+//
+//    String getUserName();
+//
+//    String getUserEmail();
 
 
 

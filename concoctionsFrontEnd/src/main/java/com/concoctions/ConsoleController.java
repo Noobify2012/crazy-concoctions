@@ -1,16 +1,14 @@
 package com.concoctions;
 
+import com.concoctions.menus.DrinkBuilder;
 import com.concoctions.menus.DrinkMenu;
 import com.concoctions.menus.DrinkMenuInt;
-import com.concoctions.model.Category;
-import com.concoctions.model.Drink;
-import com.concoctions.model.DrinkIngredient;
-import com.concoctions.model.FoodItem;
-import com.concoctions.model.Ingredient;
+import com.concoctions.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import net.minidev.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
@@ -49,8 +47,9 @@ public class ConsoleController implements Controller {
     private HttpClient client;
     private ObjectMapper mapper;
     private Gson gson;
-
     private DrinkMenuInt DrinkMenu;
+
+    private User user;
 
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
@@ -60,7 +59,7 @@ public class ConsoleController implements Controller {
         this.scan = new Scanner(in);
         this.client = client;
         mapper = new ObjectMapper();
-        gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();;
         DrinkMenu = new DrinkMenu();
     }
 
@@ -179,6 +178,7 @@ public class ConsoleController implements Controller {
     @Override
     public void start() throws IOException, InterruptedException, JSONException {
         getRegStatus();
+        mainMenu();
     }
 
 
@@ -226,6 +226,12 @@ public class ConsoleController implements Controller {
             System.out.println("It looks like we can't find you, try again");
             login();
         } else {
+//            JSONArray userJson = new JSONArray(response.toString());
+//            JSONArray drinkJson = parser.parse(drinkstring);
+            // have to make this 'Type' class because of type erasure for generics in Java
+//             this.user = new TypeToken<User>() {}.getType();
+            String tempUser = response.body().toString();
+            this.user = gson.fromJson(tempUser, User.class);
             mainMenu();
         }
 
@@ -269,13 +275,6 @@ public class ConsoleController implements Controller {
         System.exit(0);
     }
 
-    /**
-     *
-     */
-    @Override
-    public void createProfile() {
-
-    }
 
 
     /**
@@ -283,13 +282,9 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void buildNewRecipe() throws IOException, InterruptedException {
-        String drinkSearch = "Time to build some drinks";
-        try {
-            //String element = scan.next();
-            out.append(drinkSearch + "\n");
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Append failed", ioe);
-        }
+        System.out.println("Time to build some drinks");
+        DrinkBuilder drinkBuilder = new DrinkBuilder();
+        NewDrink newDrink = drinkBuilder.buildNewDrink(scan, gson, this.user, client);
         mainMenu();
     }
 
@@ -437,53 +432,48 @@ public class ConsoleController implements Controller {
             throw new IllegalStateException("Append failed", ioe);
         }
         userOption = getUserInput();
-        JSONObject drinkObj = new JSONObject();
-        drinkObj.put("drinkName", userOption);
+//        JSONObject drinkObj = new JSONObject();
+//        drinkObj.put("drinkName", userOption);
         String subDir = "find";
-        System.out.println(drinkObj);
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?"))
-                .header("Content-Type", "application/json")
-//                .GET()
-
-                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
-                .build();
-        System.out.println(subDir);
+//        System.out.println(drinkObj);
+//        var request = HttpRequest.newBuilder()
+//                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?"))
+//                .header("Content-Type", "application/json")
+////                .GET()
+//
+//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
+//                .build();
+//        System.out.println(subDir);
+        String possibleOutput = "";
 
         try {
-            URIBuilder ub = new URIBuilder("http://localhost:8080/");
-            ub.addParameter("drinkName", "espresso martini");
-            String possibleOutput = ub.toString();
-            System.out.println("Possible output: " + possibleOutput);
+            URIBuilder ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
+            ub.addParameter("drinkName", userOption);
+            possibleOutput = ub.toString();
+//            System.out.println("Possible output: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
         }
 
-
-        var request2 = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?drinkName=" + userOption))
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(possibleOutput))
                 .header("Content-Type", "application/json")
                 .GET()
-//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
                 .build();
 
-
-
-        var response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-        System.out.println(request2);
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//         System.out.println(request2);
 //        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response2.statusCode());
-        String drinkstring = response2.body();
-        System.out.println(drinkstring);
+        System.out.println(response.statusCode());
+        String drinkString = response.body();
+        System.out.println(drinkString);
 
 
     }
 
     protected void getAllDrinks(String dir) throws IOException, InterruptedException {
         String subDir = "all";
-//        JSONObject drinkObj = new JSONObject();
-//        System.out.println("login obj: " + loginObj.toString());
 
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
@@ -573,7 +563,7 @@ public class ConsoleController implements Controller {
 
 
         if (response.statusCode() != 200) {
-            System.out.println("It looks like we can't any drinks lets try again, try again");
+            System.out.println("It looks like we find can't any drinks lets try again, try again");
             getDrinks();
         } else {
             mainMenu();
