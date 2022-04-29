@@ -60,6 +60,7 @@ public class JdbcIngredientRepo implements IngredientRepo {
               .name(row.getString("name"))
               .description(row.getString("description"))
               .type(type)
+              .isAlcoholic(row.getBoolean("isAlcoholic"))
               .build();
         }
     );

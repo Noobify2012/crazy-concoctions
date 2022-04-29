@@ -57,7 +57,7 @@ public class DrinkController {
       @RequestParam(required = false) String drinkName,
       @RequestParam(required = false) String categoryName
   ){
-    List<Drink> drinks = List.of();
+    List<Drink> drinks;
     if (userId != null) {
       drinks = drinkRepo.getAllByUserId(userId);
     } else if (categoryId != null){
