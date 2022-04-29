@@ -37,6 +37,20 @@ public class IngredientController {
     return ResponseEntity.ok(ingredients);
   }
 
+  @GetMapping("/find/{ingredientId}")
+  public ResponseEntity<Ingredient> findIngredient(
+      @PathVariable long ingredientId
+  ){
+    Optional<Ingredient> ingredient = ingredientRepo.getById(ingredientId);
+    return ingredient.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
+  }
+
   @PostMapping("/save")
   public ResponseEntity<Ingredient> saveIngredient(
       @RequestBody IngredientDto ingredientDto
