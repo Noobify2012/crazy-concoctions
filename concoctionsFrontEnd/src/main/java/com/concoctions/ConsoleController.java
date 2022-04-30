@@ -2,8 +2,7 @@ package com.concoctions;
 
 /*
 Remaining TODOs
-TODO Edit drink
-TODO COPY and Edit a drink
+
 TODO clean up drink parsing
 TODO Documentation
  */
@@ -152,38 +151,7 @@ public class ConsoleController implements Controller {
         object.put(field, input);
         return object;
     }
-//    private JSONObject getEmail(JSONObject newUser) {
-//        String email = "";
-//        String emailRegex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-//                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-//        while(!patternMatches(email, emailRegex)) {
-//            System.out.println("Please enter a valid email");
-//            email = getUserInput();
-//        }
-//        newUser.put("email", getUserInput());
-//        return newUser;
-//    }
-//
-//    private JSONObject getUserName(JSONObject newUser) {
-//        String username = "";
-//        String usernameRegex = "[^A-Za-z0-9]+";
-//        while(!patternMatches(username, usernameRegex)) {
-//            System.out.println("Please enter a username, letters and numbers only, no spaces");
-//            username = getUserInput();
-//        }
-//        newUser.put("username", getUserInput());
-//        return newUser;
-//    }
-//
-//    private JSONObject getPassword(JSONObject newUser) {
-//        String password = "";
-//        while(password.isEmpty()) {
-//            System.out.println("Please enter a password, empty passwords not allowed");
-//            password = getUserInput();
-//        }
-//        newUser.put("password", getUserInput());
-//        return newUser;
-//    }
+
 
     /**
      *
@@ -208,7 +176,7 @@ public class ConsoleController implements Controller {
         String userString = getUserInput();
 //        System.out.println("This is what I got for userName: "+ userString);
 
-        String passwordString = "Please enter your username and press enter: ";
+        String passwordString = "Please enter your password and press enter: ";
         try {
             //String element = scan.next();
             out.append(passwordString + "\n");
@@ -239,10 +207,6 @@ public class ConsoleController implements Controller {
             System.out.println("It looks like we can't find you, try again");
             login();
         } else {
-//            JSONArray userJson = new JSONArray(response.toString());
-//            JSONArray drinkJson = parser.parse(drinkstring);
-            // have to make this 'Type' class because of type erasure for generics in Java
-//             this.user = new TypeToken<User>() {}.getType();
             String tempUser = response.body().toString();
             this.user = gson.fromJson(tempUser, User.class);
             mainMenu();
@@ -265,12 +229,14 @@ public class ConsoleController implements Controller {
             userOption = getUserInput();
         }
         if (userOption.equalsIgnoreCase("s")) {
-//            DrinkMenu.getDrinkSearch(scan);
             getDrinks();
+            mainMenu();
         } else if (userOption.equalsIgnoreCase("n")) {
             buildNewRecipe();
+            mainMenu();
         } else if (userOption.equalsIgnoreCase("e")) {
             removeRecipe();
+            mainMenu();
         } else if (userOption.equalsIgnoreCase("c")) {
             commentsMenu();
             mainMenu();
@@ -302,20 +268,17 @@ public class ConsoleController implements Controller {
         System.out.println("Time to build some drinks");
         DrinkBuilder drinkBuilder = new DrinkBuilder();
         NewDrink newDrink = drinkBuilder.buildNewDrink(scan, gson, this.user, client);
-//        System.out.println("New drink going out the door: " + newDrink);
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(newDrink)))
                 .build();
-//        System.out.println("Request body: ");
         System.out.println(gson.toJson(newDrink));
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
 
-//        var newDrinkResponse = send.twoDirPost("drinks", "save", newDrink.toString(), "", client);
         if (response.statusCode() == 200) {
             System.out.println("GREAT SUCCESS I LIKE YOUR DRINK!!!!");
         } else {
@@ -362,7 +325,7 @@ public class ConsoleController implements Controller {
                 removeRecipe();
             }
         } else if (action.equalsIgnoreCase("E") | action.equalsIgnoreCase("Edit")) {
-            //TODO method to edit drink
+
 
             NewDrink updatedDrink = new NewDrink();
             boolean complete = false;
@@ -462,20 +425,10 @@ public class ConsoleController implements Controller {
                     }
                 }
                 System.out.println("This is for the entire drink");
-                complete = builder.isComplete(scan);
+                complete = builder.isCompleteEdit(scan);
 
             }
             System.out.println("New List: " + drinkIngredients);
-            /*
-            private long userId;
-            private String name;
-            private long categoryId;
-            private boolean isHot;
-            private String description;
-            //fix this
-            private List<DrinkIngredientDto> drinkIngredients;
-            private List<Long> foodItemIds;
-             */
             NewDrink drinkToUpdate = new NewDrink();
             drinkToUpdate.setUserId(user.getUserId());
             drinkToUpdate.setName(drink.getName());
@@ -512,34 +465,8 @@ public class ConsoleController implements Controller {
                 System.out.println("Boo it blew up, lets try that again.");
                 removeRecipe();
             }
-
-
-//            mainMenu();
         }
-
-
-            // select ingredient to add
-//                        List<DrinkIngredientDto> drinkIngredientDtos = new ArrayList<>();
-//            drinkIngredientDtos.add(ingredientDto);
-//            //get dto read for ingredient
-//            DrinkIngredientDto ingredientDto = new DrinkIngredientDto();
-//            //add the ingredient id to the DTO
-//            ingredientDto.setIngredientId(ingredient.getIngredientId());
-//            //set the uom in the dto for the new ingredient
-//            ingredientDto.setUomId(uom.getUomId());
-//            ingredientDto.setAmount(amount);
-
-
         }
-
-
-
-
-            //after done changing, check against control
-
-            //if drink doesn't match control write back
-
-
 
 
     private Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
@@ -601,14 +528,34 @@ public class ConsoleController implements Controller {
 
     protected void getDrinksByCategory(String dir) throws IOException, InterruptedException {
         String userOption = "";
-        String menuString = "Please enter a category to search by";
-        try {
-            //String element = scan.next();
-            out.append(menuString + "\n");
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Append failed", ioe);
+        Category userCategory = null;
+        while (userOption.isEmpty()) {
+            var allResponse = request.twoDirGet("category", "all","", "", client);
+            Type categoryListType = new TypeToken<List<Category>>() {}.getType();
+            List<Category> categoryList = gson.fromJson(allResponse.body(), categoryListType);
+            for (Category c : categoryList) {
+                System.out.println(c.getName());
+            }
+            String menuString = "Please enter a category to search by from the above list";
+            try {
+                //String element = scan.next();
+                out.append(menuString + "\n");
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Append failed", ioe);
+            }
+            userOption = getUserInput();
+            for (Category c : categoryList) {
+                if (userOption.equalsIgnoreCase(c.getName())) {
+                    userCategory = c;
+                }
+            }
+
+            if (userCategory == null) {
+                System.out.println("I'm sorry, we didn't find your category. Lets start over.");
+                getDrinksByCategory(dir);
+            }
         }
-        userOption = getUserInput();
+
         String subDir = "find";
         URIBuilder ub;
         try {
@@ -632,11 +579,22 @@ public class ConsoleController implements Controller {
 
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(request);
-//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        String drinkstring = response.body();
-        System.out.println(drinkstring);
+        Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+        List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
+        for (Drink drink : drinkList) {
+            System.out.println("User Id: " + drink.getUserId() + " Name: " + drink.getName() + " Category: " + drink.getCategory().getName() + " Drink Description: " + drink.getDescription());
+            for (int i = 0; i < drink.getDrinkIngredients().size(); i++){
+                System.out.println("Ingredient: " + drink.getDrinkIngredients().get(i).getIngredient().getName() + " amount " + drink.getDrinkIngredients().get(i).getAmount() + " " + drink.getDrinkIngredients().get(i).getUom().getName());
+            }
+            for (int i = 0; i < drink.getPairings().size(); i++){
+                System.out.println("Pairs with : " + drink.getPairings().get(i).getName());
+            }
+        }
+//        System.out.println(request);
+////        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.statusCode());
+//        String drinkstring = response.body();
+//        System.out.println(drinkstring);
     }
 
     protected void getDrinksByID(String dir) throws IOException, InterruptedException {
@@ -672,11 +630,22 @@ public class ConsoleController implements Controller {
 
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(request);
-//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        String drinkstring = response.body();
-        System.out.println(drinkstring);
+        Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+        List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
+        for (Drink drink : drinkList) {
+            System.out.println("User Id: " + drink.getUserId() + " Name: " + drink.getName() + " Category: " + drink.getCategory().getName() + " Drink Description: " + drink.getDescription());
+            for (int i = 0; i < drink.getDrinkIngredients().size(); i++){
+                System.out.println("Ingredient: " + drink.getDrinkIngredients().get(i).getIngredient().getName() + " amount " + drink.getDrinkIngredients().get(i).getAmount() + " " + drink.getDrinkIngredients().get(i).getUom().getName());
+            }
+            for (int i = 0; i < drink.getPairings().size(); i++){
+                System.out.println("Pairs with : " + drink.getPairings().get(i).getName());
+            }
+        }
+//        System.out.println(request);
+////        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.statusCode());
+//        String drinkstring = response.body();
+//        System.out.println(drinkstring);
     }
 
     protected List<Drink> getDrinkListByID(String dir, Long UID) throws IOException, InterruptedException {
@@ -703,11 +672,6 @@ public class ConsoleController implements Controller {
 
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//        System.out.println(request);
-////        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//        System.out.println(response.statusCode());
-//        String drinkstring = response.body();
-//        System.out.println(drinkstring);
 
         Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
         List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
@@ -730,25 +694,13 @@ public class ConsoleController implements Controller {
             throw new IllegalStateException("Append failed", ioe);
         }
         userOption = getUserInput();
-//        JSONObject drinkObj = new JSONObject();
-//        drinkObj.put("drinkName", userOption);
         String subDir = "find";
-//        System.out.println(drinkObj);
-//        var request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "?"))
-//                .header("Content-Type", "application/json")
-////                .GET()
-//
-//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
-//                .build();
-//        System.out.println(subDir);
         String possibleOutput = "";
 
         try {
             URIBuilder ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
             ub.addParameter("drinkName", userOption);
             possibleOutput = ub.toString();
-//            System.out.println("Possible output: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
@@ -761,11 +713,17 @@ public class ConsoleController implements Controller {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//         System.out.println(request2);
-//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        String drinkString = response.body();
-        System.out.println(drinkString);
+        Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+        List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
+        for (Drink drink : drinkList) {
+            System.out.println("User Id: " + drink.getUserId() + " Name: " + drink.getName() + " Category: " + drink.getCategory().getName() + " Drink Description: " + drink.getDescription());
+            for (int i = 0; i < drink.getDrinkIngredients().size(); i++){
+                System.out.println("Ingredient: " + drink.getDrinkIngredients().get(i).getIngredient().getName() + " amount " + drink.getDrinkIngredients().get(i).getAmount() + " " + drink.getDrinkIngredients().get(i).getUom().getName());
+            }
+            for (int i = 0; i < drink.getPairings().size(); i++){
+                System.out.println("Pairs with : " + drink.getPairings().get(i).getName());
+            }
+        }
 
 
     }
@@ -777,15 +735,13 @@ public class ConsoleController implements Controller {
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
                 .GET()
-//                .POST(HttpRequest.BodyPublishers.ofString(drinkObj.toString()))
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
         JsonNode node = mapper.readTree(drinkstring);
-//        System.out.println("Value of node: " + node);
-//        System.out.println("Before parsing: " + response.body());
+
         try {
             JSONArray drinkJson = new JSONArray(drinkstring);
 //            JSONArray drinkJson = parser.parse(drinkstring);
@@ -805,14 +761,14 @@ public class ConsoleController implements Controller {
                     hotString = "Cold";
                 }
                 String description = d.getDescription();
-                System.out.println("Drink ID: " + dID + "\nUser ID: " + userId + "\nDrink Name: " + name + "\nCategory: " + category.getName() + "\nHot or Cold: " + hotString + "\nDescription: " + description + "\nIngredients ");
+                System.out.println("Drink : " + name + "\nCategory: " + category.getName() + "\nHot or Cold: " + hotString + "\nDescription: " + description);
                 List<DrinkIngredient> drinkIngredients = d.getDrinkIngredients();
                 for (DrinkIngredient di : drinkIngredients) {
                     String alcString = "No";
                     if (di.getIngredient().isAlcoholic()) {
                         alcString = "Yes";
                     }
-                    System.out.println("Ingredient: " + di.getIngredient().getName() + " description: " + di.getIngredient().getDescription() + " Contains Alcohol: " + alcString + " is this actually alcholic: " + di.getIngredient().isAlcoholic() + " " + di.getIngredient());
+                    System.out.println("Ingredient: " + di.getIngredient().getName() + " Contains Alcohol: " + alcString);
                 }
                 List<FoodItem> pairingsList = d.getPairings();
                 if (!pairingsList.isEmpty()) {

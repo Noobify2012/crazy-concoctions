@@ -25,6 +25,8 @@ public interface DrinkBuilderInt {
 
     boolean isCompleteRemove(Scanner scan);
 
+    boolean isCompleteEdit(Scanner scan);
+
 
 
 }

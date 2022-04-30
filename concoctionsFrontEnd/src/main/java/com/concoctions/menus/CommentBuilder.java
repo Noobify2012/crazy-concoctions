@@ -44,7 +44,6 @@ public class CommentBuilder implements CommentBuilderInt {
                 userString = "";
             }
         }
-
     }
 
     private void readMenu(User user, Scanner scan, HttpClient client, Gson gson) throws IOException, InterruptedException {
@@ -250,31 +249,20 @@ public class CommentBuilder implements CommentBuilderInt {
         //send drink comment to server
         dir = "comments";
         subDir = "save";
-//        System.out.println("New drink going out the door: " + newDrink);
         var request2 = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userComment)))
                 .build();
-//        System.out.println("Request body: ");
-//        System.out.println(gson.toJson(userComment));
+
 
         var response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response2.statusCode());
-//        String returnString = response2.body();
-        System.out.println(response2.body());
 
-//        var newDrinkResponse = send.twoDirPost("drinks", "save", newDrink.toString(), "", client);
         if (response.statusCode() == 200) {
             System.out.println("GREAT SUCCESS I LIKE YOUR COMMENT!!!!");
         } else {
             System.out.println(response2.body());
-
         }
-
-
-
-
     }
 
     private String getUserInput(Scanner scan) {

@@ -155,7 +155,24 @@ public class DrinkBuilder implements DrinkBuilderInt {
         boolean comp = false;
         boolean valid = false;
         while (!valid) {
-            System.out.println("Would you like to add another item? (Y)es or (N)");
+            System.out.println("Would you like to remove another item? (Y)es or (N)");
+            String temp = scan.nextLine();
+            if(temp.equalsIgnoreCase("No") | temp.equalsIgnoreCase("N")) {
+                comp = true;
+                valid = true;
+            } else if (temp.equalsIgnoreCase("Yes") | temp.equalsIgnoreCase("y")) {
+                valid = true;
+            }
+        }
+        return comp;
+    }
+
+    @Override
+    public boolean isCompleteEdit(Scanner scan) {
+        boolean comp = false;
+        boolean valid = false;
+        while (!valid) {
+            System.out.println("Would you like to edit anything else with this drink? (Y)es or (N)");
             String temp = scan.nextLine();
             if(temp.equalsIgnoreCase("No") | temp.equalsIgnoreCase("N")) {
                 comp = true;
