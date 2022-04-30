@@ -443,12 +443,13 @@ public class ConsoleController implements Controller {
             System.out.println("This is the update status : " + updateStatus);
             if(updateStatus == 200) {
                 System.out.println("This seems new and fresh. Thanks for the update!");
+                mainMenu();
             } else {
                 System.out.println("Boo it blew up, lets try that again.");
                 removeRecipe();
             }
         }
-        }
+    }
 
 
     private Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
