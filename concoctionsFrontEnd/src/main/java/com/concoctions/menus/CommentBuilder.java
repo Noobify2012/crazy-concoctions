@@ -1,10 +1,7 @@
 package com.concoctions.menus;
 
 import com.concoctions.ConsoleController;
-import com.concoctions.model.Category;
-import com.concoctions.model.Comment;
-import com.concoctions.model.Drink;
-import com.concoctions.model.User;
+import com.concoctions.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -41,6 +38,7 @@ public class CommentBuilder implements CommentBuilderInt {
                 readMenu(user, scan, client, gson);
             } else if (userString.equalsIgnoreCase("W") | userString.equalsIgnoreCase("Write")) {
                 //time to write
+                writeComment(user, scan, client, gson);
             } else {
                 System.out.println("I'm sorry " + userString + " is not a valid, lets try again");
                 userString = "";
@@ -96,7 +94,7 @@ public class CommentBuilder implements CommentBuilderInt {
                     break;
                 }
             }
-            if (drinkToRead.getName().isEmpty()) {
+            if (drinkToRead == null ) {
                 System.out.println("I'm sorry I didn't find that drink, please enter another name.");
                 drinkString = "";
             }
@@ -112,8 +110,6 @@ public class CommentBuilder implements CommentBuilderInt {
         try {
             ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
             ub.addParameter("drinkId", drinkID.toString());
-            String possibleOutput = ub.toString();
-            System.out.println("Possible output: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
@@ -129,10 +125,9 @@ public class CommentBuilder implements CommentBuilderInt {
 
 
         var response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-//        System.out.println(request2);
-//        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
         System.out.println(response2.statusCode());
-//        System.out.println(response2.body());
+
 
         Type drinkCommentType = new TypeToken<List<Comment>>() {}.getType();
         drinkComments = gson.fromJson(response2.body(), drinkCommentType);
@@ -169,13 +164,116 @@ public class CommentBuilder implements CommentBuilderInt {
 
     /**
      * @param user
-     * @param drink
      * @param scan
      * @param client
      * @param gson
      */
     @Override
-    public void writeComment(User user, Drink drink, Scanner scan, HttpClient client, Gson gson) {
+    public void writeComment(User user, Scanner scan, HttpClient client, Gson gson) throws IOException, InterruptedException {
+
+        String drinkName = "";
+        System.out.println("Which drink do you want to write comments about? Please enter the drink's name");
+        //get all drinks and print to screen
+        String subDir = "all";
+        String dir = "drinks";
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+
+        List<Drink> drinkList;
+        try {
+            // have to make this 'Type' class because of type erasure for generics in Java
+            Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+            drinkList = gson.fromJson(response.body(), drinkListType);
+            for (Drink d : drinkList) {
+                String name = d.getName();
+                System.out.println("Drink Name: " + name);
+            }
+        } catch (JsonSyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        //get user input and check if drink is in list
+        String drinkString = "";
+        Drink drinkToRead = null;
+        while(drinkString.isEmpty()) {
+            drinkString = getUserInput(scan);
+            for (Drink d : drinkList) {
+                String name = d.getName();
+                if (name.equalsIgnoreCase(drinkString)) {
+                    //if in list get drink
+                    System.out.println("Found " + d.getName() + ".");
+                    drinkToRead = d;
+                    break;
+                }
+            }
+            if (drinkToRead == null ) {
+                System.out.println("I'm sorry I didn't find that drink, please enter another name.");
+                drinkString = "";
+            }
+        }
+
+        NewComment userComment = new NewComment();
+        userComment.setUserId(user.getUserId());
+        userComment.setDrinkId(drinkToRead.getDrinkId());
+
+        System.out.println("How would you rank this drink between 1 and 10? Please enter a whole number value.");
+        int userRanking = 0;
+        while (userRanking == 0) {
+            String userInput = getUserInput(scan);
+            userRanking = Integer.parseInt(userInput);
+            if (userRanking > 0 && userRanking < 11) {
+                System.out.println("You ranked " + drinkToRead.getName() + " a " + userRanking + " out of 10");
+                userComment.setRanking(userRanking);
+            } else {
+                System.out.println("I'm sorry that isn't a valid input. Please select a whole number from 1 to 10.");
+                userRanking = 0;
+            }
+        }
+
+        System.out.println("What are you thoughts on this drink?");
+        String userWords = "";
+        while (userWords.isEmpty()) {
+            userWords = getUserInput(scan);
+            if (!userWords.isEmpty()) {
+                System.out.println("Thank you for your feedback");
+                userComment.setCommentBody(userWords);
+            }
+        }
+
+        //send drink comment to server
+        dir = "comments";
+        subDir = "save";
+//        System.out.println("New drink going out the door: " + newDrink);
+        var request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userComment)))
+                .build();
+//        System.out.println("Request body: ");
+//        System.out.println(gson.toJson(userComment));
+
+        var response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response2.statusCode());
+//        String returnString = response2.body();
+        System.out.println(response2.body());
+
+//        var newDrinkResponse = send.twoDirPost("drinks", "save", newDrink.toString(), "", client);
+        if (response.statusCode() == 200) {
+            System.out.println("GREAT SUCCESS I LIKE YOUR COMMENT!!!!");
+        } else {
+            System.out.println(response2.body());
+
+        }
+
+
+
 
     }
 

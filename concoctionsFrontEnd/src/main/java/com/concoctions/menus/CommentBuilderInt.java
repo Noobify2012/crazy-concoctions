@@ -18,5 +18,5 @@ public interface CommentBuilderInt {
 
     List<Comment> getCommentsByDrinkID(Long DID, Scanner scan, HttpClient client, Gson gson);
 
-    void writeComment(User user, Drink drink, Scanner scan, HttpClient client, Gson gson);
+    void writeComment(User user, Scanner scan, HttpClient client, Gson gson) throws IOException, InterruptedException;
 }

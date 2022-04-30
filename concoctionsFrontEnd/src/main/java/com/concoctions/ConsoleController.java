@@ -6,7 +6,6 @@ TODO Edit drink
 TODO COPY and Edit a drink
 TODO clean up drink parsing
 TODO add a comment
-TODO get all comments for a drink
 TODO Documentation
  */
 
@@ -734,22 +733,7 @@ public class ConsoleController implements Controller {
     }
 
     protected void commentsMenu() throws IOException, InterruptedException {
-        String userOption = "";
-        while (!userOption.equalsIgnoreCase("r") && !userOption.equalsIgnoreCase("l")) {
-            String menuString = "Comment Menu, Please select from one of the following options:\n R - Read Comments\n L - Leave a Comment";
-            try {
-                //String element = scan.next();
-                out.append(menuString + "\n");
-            } catch (IOException ioe) {
-                throw new IllegalStateException("Append failed", ioe);
-            }
-            userOption = getUserInput();
-        }
-        if (userOption.equalsIgnoreCase("r")) {
-            readComments();
-        } else if (userOption.equalsIgnoreCase("l")) {
-            leaveComments();
-        }
+        commentMenu.CommentMenu(user, scan, client, gson);
         mainMenu();
     }
 
