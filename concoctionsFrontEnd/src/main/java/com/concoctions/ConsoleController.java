@@ -1,8 +1,16 @@
 package com.concoctions;
 
-import com.concoctions.menus.DrinkBuilder;
-import com.concoctions.menus.DrinkMenu;
-import com.concoctions.menus.DrinkMenuInt;
+/*
+Remaining TODOs
+TODO Edit drink
+TODO COPY and Edit a drink
+TODO clean up drink parsing
+TODO add a comment
+TODO get all comments for a drink
+TODO Documentation
+ */
+
+import com.concoctions.menus.*;
 import com.concoctions.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +58,8 @@ public class ConsoleController implements Controller {
 
     private Request request;
 
+    private CommentBuilderInt commentMenu;
+
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
             throw new IllegalArgumentException("Readable and Appendable can't be null");
@@ -61,6 +71,7 @@ public class ConsoleController implements Controller {
         this.gson = new GsonBuilder().setPrettyPrinting().create();;
         DrinkMenu = new DrinkMenu();
         this.request = new RequestBuilder();
+        this.commentMenu = new CommentBuilder();
     }
 
     private String getUserInput() {
@@ -260,6 +271,7 @@ public class ConsoleController implements Controller {
             removeRecipe();
         } else if (userOption.equalsIgnoreCase("c")) {
             commentsMenu();
+            mainMenu();
         } else if (userOption.equalsIgnoreCase("q")) {
             quit();
         }
@@ -753,6 +765,7 @@ public class ConsoleController implements Controller {
         } catch (IOException ioe) {
             throw new IllegalStateException("Append failed", ioe);
         }
+        commentMenu.CommentMenu(user, scan, client, gson);
         mainMenu();
     }
 
