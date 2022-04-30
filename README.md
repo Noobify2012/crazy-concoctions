@@ -6,11 +6,45 @@ Written by
 
 
 ## Requirements
-1. Java 11+ (we like [sdkman](https://sdkman.io/) to manage our java)
-1. Docker ***OR*** MySql
+1. [Java](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html) 11+ (we like [sdkman](https://sdkman.io/) to manage our java)
+1. [Docker](https://www.docker.com/products/personal/) ***OR*** [MySql](https://www.mysql.com/downloads/)
+1. [Maven](https://maven.apache.org/download.cgi) (if you're going to compile the backend and frontend)
 1. A can do attitude
 
+<hr />
+
+## Technical Specifications
+
+### Database
+The database is a MySQL database
+
+### Backend 
+The backend uses a java with libraries like Spring to simplify communication with the MySQL server and create a simplified API over http (using a *rest like* protocol. . . .though it's very *not* rest).
+
+### Frontend
+The frontend uses java to create a CLI as a client for the backend api.
+
+<hr />
+
+
 ## Running
+
+### **tl;dr**
+open up a terminal `cd` into the project directory.
+
+*run the database server and backend server*
+```bash
+docker-compose -f ./docker/docker-compose.yml up --build -d
+java -jar concoctionsBackend.jar
+```
+open up another terminal and `cd` into the project directory
+
+*run the frontend client*
+```bash
+java -jar concoctionsFrontend.jar
+```
+
+<hr />
 
 ### **Database**
 
@@ -18,7 +52,7 @@ Written by
 
 If you want to dockerize the DB, from the main project directory run:
 ```bash
-docker-compose -f ./docker/docker-compose.yql up --build -d
+docker-compose -f ./docker/docker-compose.yml up --build -d
 ```
 Docker is running the server on `3306`.
 If you want to change this, you'll need to 
@@ -26,6 +60,11 @@ If you want to change this, you'll need to
 1. change `./docker/docker-compose.yml` under the ports line. It's in the format `[output port]:[internal port]`
 1. change `concoctionsBackend/src/main/resources/application.properties` so the line read `spring.datasource.url=jdbc:mysql://localhost:[ENTER output port NUMBER HERE]/concoctionsDB`
 1. follow the recompile  instructions below for the backend.
+
+If there's an issue, you can run 
+```bash
+docker-compose -f ./docker/docker-compose.yml
+```
 
 #### **--- Local MySQL**
 
@@ -63,15 +102,8 @@ For the backend, there will only be one jar to run, so just `java -jar [new_jar_
 
 For the front end, you'll see two jars, so you'll want to run the jar that's appended with `with-dependencies.jar`
 
-## Technical Specifications
-### Database
-The database is a MySQL database
+<hr />
 
-### Backend 
-The backend uses a java with libraries like Spring to simplify communication with the MySQL server and create a simplified API over http (using a *rest like* protocol. . . .though it's very *not* rest).
-
-### Frontend
-The frontend uses java to create a CLI as a client for the backend api.
 
 ## Lessons Learned
 ### Daniel Blum
@@ -93,6 +125,8 @@ After discovering Gson and brushing up on generics, the passing of objects becam
 Using the native Http client was a bit of a pain but after some googling it became much easier. The biggest lesson learned between the Httpclient and Gson is that you have to pass the Json as a converted string not convert to string then send. 
 
 Lesson Relearned - even if you think its going to be a quick and easy controller, plan more for the code architecture, and you will deal with a lot less chaos. 
+
+<hr />
 
 ## Future Work
 ### Backend
