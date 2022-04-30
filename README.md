@@ -12,16 +12,11 @@ Written by
 
 ## Running
 
-<<<<<<< Updated upstream
-=======
-First, just go ahead an unzip `[insert zip file name here]` and cd into the new folder.
-
->>>>>>> Stashed changes
-### Database
+### **Database**
 
 #### **--- Docker**
 
-If you to dockerize the DB, from the main project directory run:
+If you want to dockerize the DB, from the main project directory run:
 ```bash
 docker-compose -f ./docker/docker-compose.yql up --build -d
 ```
@@ -34,45 +29,21 @@ If you want to create and initialize the database yourself, run the sql files `0
 
 #### **--- Jars**
 Both the backend and frontend are packaged in fatjars, so the only thing you need install is Java 11+.
-<<<<<<< Updated upstream
-So, just run
-
-```bash
-[insert final backend jar file here]
-```
-
-and in a another terminal (unless you're running this `nohup`)
-
-```bash
-[insert finale frontend jar file here]
-```
-
-
-#### **--- Compile and run**
-Both the frontend and backend are maven projects with maven scripts. 
-For the backend, `cd` into `concoctionsBackend` and run:
-```bash
-./mvnw spring-boot:run
-```
-or, 
-and this will la
-
-
-=======
-So, from the main project folder, go ahead a run:
+So, from the main project folder, go ahead and run:
 
 ```bash
 java -jar [insert final backend jar file here]
 ```
 
-and in a another terminal (unless you're running `nohup`)
+and in a another terminal (unless you're running this `nohup`)
 
 ```bash
 java -jar [insert finale frontend jar file here]
 ```
 
+
 #### **--- Compile and run**
-Both projects are using maven so make sure that's insalled.
+Both projects are using maven so make sure that's installed.
 Then, `cd` into either sub-project's folder and run 
 
 ```bash
@@ -124,6 +95,5 @@ There's currently ***NO*** backend validation :)
 I mean, the server sends the right status code, but I'm not sure the user wants a full stack dump of the error in the body of the response when one occurs :)
 
 ### Frontend
->>>>>>> Stashed changes
 
 
