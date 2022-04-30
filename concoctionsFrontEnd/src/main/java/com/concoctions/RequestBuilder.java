@@ -1,5 +1,6 @@
 package com.concoctions;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -87,15 +88,38 @@ public class RequestBuilder implements Request {
     /**
      * @param dir
      * @param subDir
-     * @param query
      * @return
      */
     @Override
-    public HttpResponse<String> twoDirPost(String dir, String subDir, String object, String userString, HttpClient client) throws IOException, InterruptedException {
+    public HttpResponse<String> twoDirPost(String dir, String subDir, String object, String userString, HttpClient client, Gson gson) throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(object))
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(object)))
+                .build();
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+        return response;
+    }
+
+    /**
+     * @param dir
+     * @param subDir
+
+     * @param client
+
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Override
+    public HttpResponse<String> removeDrinkDelete(String dir, String subDir, Long DID, HttpClient client) throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "/" + DID))
+                .header("Content-Type", "application/json")
+                .DELETE()
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());

@@ -21,10 +21,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
@@ -35,7 +32,6 @@ import java.lang.reflect.Type;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -52,6 +48,8 @@ public class ConsoleController implements Controller {
 
     private User user;
 
+    private Request request;
+
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
             throw new IllegalArgumentException("Readable and Appendable can't be null");
@@ -62,6 +60,7 @@ public class ConsoleController implements Controller {
         mapper = new ObjectMapper();
         this.gson = new GsonBuilder().setPrettyPrinting().create();;
         DrinkMenu = new DrinkMenu();
+        this.request = new RequestBuilder();
     }
 
     private String getUserInput() {
@@ -289,13 +288,13 @@ public class ConsoleController implements Controller {
         System.out.println("Time to build some drinks");
         DrinkBuilder drinkBuilder = new DrinkBuilder();
         NewDrink newDrink = drinkBuilder.buildNewDrink(scan, gson, this.user, client);
-        System.out.println("New drink going out the door: " + newDrink);
+//        System.out.println("New drink going out the door: " + newDrink);
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(newDrink)))
                 .build();
-        System.out.println("Request body: ");
+//        System.out.println("Request body: ");
         System.out.println(gson.toJson(newDrink));
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -317,15 +316,47 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void removeRecipe() throws IOException, InterruptedException {
-        String drinkSearch = "Time to remove some drinks";
-        try {
-            //String element = scan.next();
-            out.append(drinkSearch + "\n");
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Append failed", ioe);
+        Drink drink = new Drink();
+        System.out.println("Time to remove some drinks");
+        List<Drink> usersDrinks = getDrinkListByID("drinks", user.getUserId());
+        System.out.println("Which drink would you like to remove or edit? ");
+        String drinkName = getUserInput();
+        System.out.println("Size of usersDrinks: " + usersDrinks.size());
+        System.out.println("Drink name recieved: " + drinkName);
+        for (int i = 0; i < usersDrinks.size(); i++){
+            System.out.println("Current Drink Name: " + usersDrinks.get(i).getName());
+            if (usersDrinks.get(i).getName().equalsIgnoreCase(drinkName)) {
+                drink = usersDrinks.get(i);
+                System.out.println("Bang");
+                break;
+            }
         }
+        if (drink.getName() == null) {
+            System.out.println("we didn't find your drink lets try again");
+            removeRecipe();
+        }
+        System.out.println("Enter (R)emove or (E)dit to remove or edit the drink");
+        String action = getUserInput();
+        if (action.equalsIgnoreCase("R") | action.equalsIgnoreCase("Remove")) {
+            var deleteResponse = request.removeDrinkDelete("drinks", "delete", drink.getDrinkId(), client);
+            System.out.println(deleteResponse.statusCode());
+            if (deleteResponse.statusCode() == 204) {
+                System.out.println("Drink removed");
+                mainMenu();
+            } else {
+                System.out.println("Drink removal failed");
+                removeRecipe();
+            }
+        } else if (action.equalsIgnoreCase("E") | action.equalsIgnoreCase("Edit")) {
+            //TODO method to edit drink
+        } else {
+            System.out.println("Sorry that's not an option lets start over.");
+        }
+
+
         mainMenu();
     }
+
 
     /**
      *
@@ -443,6 +474,46 @@ public class ConsoleController implements Controller {
         System.out.println(response.statusCode());
         String drinkstring = response.body();
         System.out.println(drinkstring);
+    }
+
+    protected List<Drink> getDrinkListByID(String dir, Long UID) throws IOException, InterruptedException {
+        List<Drink> userList = new ArrayList<>();
+        String subDir = "find";
+        URIBuilder ub;
+        try {
+            ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
+            ub.addParameter("userId", UID.toString());
+            String possibleOutput = ub.toString();
+            System.out.println("Possible output: " + possibleOutput);
+        } catch (URISyntaxException e) {
+            System.out.println("Threw URIexception ");
+            throw new RuntimeException(e);
+        }
+
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ub.toString()))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(request);
+////        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.statusCode());
+//        String drinkstring = response.body();
+//        System.out.println(drinkstring);
+
+        Type drinkListType = new TypeToken<List<Drink>>() {}.getType();
+        List<Drink> drinkList = gson.fromJson(response.body(), drinkListType);
+        for (Drink d : drinkList) {
+            userList.add(d);
+            System.out.println("Drink: " + d.getName());
+        }
+
+        return userList;
     }
 
 
