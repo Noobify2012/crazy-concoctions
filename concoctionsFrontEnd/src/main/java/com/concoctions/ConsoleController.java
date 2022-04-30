@@ -1,11 +1,5 @@
 package com.concoctions;
 
-/*
-Remaining TODOs
-
-TODO clean up drink parsing
-TODO Documentation
- */
 
 import com.concoctions.menus.*;
 import com.concoctions.model.*;
@@ -13,33 +7,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.reflect.TypeToken;
 import net.minidev.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import static java.lang.Integer.parseInt;
 
 public class ConsoleController implements Controller {
     /**

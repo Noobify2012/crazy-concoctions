@@ -78,12 +78,20 @@ After all that, I had to get a handle on how to get a json object from "a user" 
 So, not as much as working in SQL, but more about how to get java to work with SQL.
 
 ### Matt Greene
-I can haz drink?
+I spent a lot of time also learning about the spring architecture to understand how to best utilize and call everything to make the data base working. 
+
+I originally started trying to parson the Json's by hand but was then pointed to Gson which is much easier. 
+
+After discovering Gson and brushing up on generics, the passing of objects became very easy. 
+
+Using the native Http client was a bit of a pain but after some googling it became much easier. The biggest lesson learned between the Httpclient and Gson is that you have to pass the Json as a converted string not convert to string then send. 
+
+Lesson Relearned - even if you think its going to be a quick and easy controller, plan more for the code architecture, and you will deal with a lot less chaos. 
 
 ## Future Work
 ### Backend
 - better transaction management:
-right now, I'm not implementing much custom transaction management and letter spring use it's default setting.
+right now, I'm not implementing much custom transaction management and letter spring use its default setting.
 This is definitely and issue as some transactions make additional calls to the database (like saving a drink) and I want to make sure all these calls to the db
 - better api calls:
 the api calls aren't super consistent. I'm learning, so I'm making some rookie mistakes and need to understand better, more consistent ways to make the calls
@@ -95,5 +103,8 @@ There's currently ***NO*** backend validation :)
 I mean, the server sends the right status code, but I'm not sure the user wants a full stack dump of the error in the body of the response when one occurs :)
 
 ### Frontend
-
+- better code management, especially the menus:
+  I had a lot of issue with passing things back and forth at first in the controller, this caused me to write a lot of the code in the controller itself which should really be in other classes. 
+- need to expand the ability to search by all parameters not just the ones specified in the project spec
+- did not get to the functionality of being able to copy another user's recipe, edit it and submit it as a new one
 
