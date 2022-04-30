@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,6 +37,20 @@ public class IngredientController {
     return ResponseEntity.ok(ingredients);
   }
 
+  @GetMapping("/find/{ingredientId}")
+  public ResponseEntity<Ingredient> findIngredient(
+      @PathVariable long ingredientId
+  ){
+    Optional<Ingredient> ingredient = ingredientRepo.getById(ingredientId);
+    return ingredient.map(value -> ResponseEntity
+            .ok()
+            .body(value))
+        .orElseGet(() -> ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(null)
+        );
+  }
+
   @PostMapping("/save")
   public ResponseEntity<Ingredient> saveIngredient(
       @RequestBody IngredientDto ingredientDto
@@ -51,7 +65,7 @@ public class IngredientController {
         );
   }
 
-  @PatchMapping("/update/{ingredientId}")
+  @PutMapping("/update/{ingredientId}")
   public ResponseEntity<Ingredient> patchIngredient(
       @PathVariable long ingredientId,
       @RequestBody IngredientDto ingredientDto
