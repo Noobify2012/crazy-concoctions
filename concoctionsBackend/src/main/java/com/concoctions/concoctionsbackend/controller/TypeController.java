@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -67,7 +67,7 @@ public class TypeController {
         );
   }
 
-  @PatchMapping("/update/{typeId}")
+  @PutMapping("/update/{typeId}")
   public ResponseEntity<Type> pathType(
       @PathVariable long typeId,
       @RequestBody TypeDto typeDto
@@ -75,17 +75,6 @@ public class TypeController {
 
     Optional<Type> type = typeRepo.update(typeId, typeDto);
 
-
-//    if (type.isEmpty()) {
-//      //todo really should get better error handling when not found
-//      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//    }
-//
-//    if (!type.get().update(typeDto)) {
-//      //todo really should get better error handling when no update
-//      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(null);
-//    }
-//    type = typeRepo.update(type.get());
     return type.map(value -> ResponseEntity
             .ok()
             .body(value))
