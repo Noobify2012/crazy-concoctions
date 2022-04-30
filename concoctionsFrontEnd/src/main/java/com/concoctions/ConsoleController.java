@@ -466,6 +466,54 @@ public class ConsoleController implements Controller {
 
             }
             System.out.println("New List: " + drinkIngredients);
+            /*
+            private long userId;
+            private String name;
+            private long categoryId;
+            private boolean isHot;
+            private String description;
+            //fix this
+            private List<DrinkIngredientDto> drinkIngredients;
+            private List<Long> foodItemIds;
+             */
+            NewDrink drinkToUpdate = new NewDrink();
+            drinkToUpdate.setUserId(user.getUserId());
+            drinkToUpdate.setName(drink.getName());
+            drinkToUpdate.setCategoryId(drink.getCategory().getCategoryId());
+            drinkToUpdate.setHot(drink.isHot());
+            drinkToUpdate.setDescription(drink.getDescription());
+            List <DrinkIngredientDto> ingredientsToAdd = new ArrayList<>();
+            for (DrinkIngredient di : drinkIngredients) {
+                DrinkIngredientDto temp = new DrinkIngredientDto();
+                temp.setIngredientId(di.getIngredient().getIngredientId());
+                temp.setUomId(di.getUom().getUomId());
+                temp.setAmount(di.getAmount());
+                ingredientsToAdd.add(temp);
+            }
+            drinkToUpdate.setDrinkIngredients(ingredientsToAdd);
+
+            List <Long> foodToAdd = new ArrayList<>();
+            for (FoodItem fi : drink.getPairings()) {
+                Long temp = 0L;
+                temp = fi.getFoodItemId();
+                foodToAdd.add(temp);
+            }
+            drinkToUpdate.setFoodItemIds(foodToAdd);
+
+            // put @ /update/{drinkId
+            var updateResponse = request.updateDrinkPut("drinks", "update", drinkToUpdate, drink.getDrinkId(), client, gson);
+
+            int updateStatus = 0;
+            updateStatus = updateResponse.statusCode();
+            System.out.println("This is the update status : " + updateStatus);
+            if(updateStatus == 200) {
+                System.out.println("This seems new and fresh. Thanks for the update!");
+            } else {
+                System.out.println("Boo it blew up, lets try that again.");
+                removeRecipe();
+            }
+
+
 //            mainMenu();
         }
 
@@ -567,7 +615,7 @@ public class ConsoleController implements Controller {
             ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
             ub.addParameter("categoryName", userOption);
             String possibleOutput = ub.toString();
-            System.out.println("Possible output: " + possibleOutput);
+//            System.out.println("Possible output1: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
@@ -607,7 +655,7 @@ public class ConsoleController implements Controller {
             ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
             ub.addParameter("userId", userOption);
             String possibleOutput = ub.toString();
-            System.out.println("Possible output: " + possibleOutput);
+//            System.out.println("Possible output2: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
@@ -639,7 +687,7 @@ public class ConsoleController implements Controller {
             ub = new URIBuilder("http://localhost:8080/" + dir + "/" + subDir);
             ub.addParameter("userId", UID.toString());
             String possibleOutput = ub.toString();
-            System.out.println("Possible output: " + possibleOutput);
+//            System.out.println("Possible output3: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);

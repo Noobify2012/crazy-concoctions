@@ -1,5 +1,6 @@
 package com.concoctions;
 
+import com.concoctions.model.NewDrink;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.client.utils.URIBuilder;
@@ -24,7 +25,7 @@ public class RequestBuilder implements Request {
             ub = new URIBuilder("http://localhost:8080/");
             ub.addParameter(query, userString);
             String possibleOutput = ub.toString();
-            System.out.println("output: " + possibleOutput);
+//            System.out.println("output: " + possibleOutput);
         } catch (URISyntaxException e) {
             System.out.println("Threw URIexception ");
             throw new RuntimeException(e);
@@ -36,7 +37,7 @@ public class RequestBuilder implements Request {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
         String drinkstring = response.body();
         if (response.statusCode() != 200) {
             System.out.println("looks like there was an issue heres what we got back: " + response);
@@ -61,7 +62,7 @@ public class RequestBuilder implements Request {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
         String drinkstring = response.body();
         return response;
     }
@@ -80,7 +81,7 @@ public class RequestBuilder implements Request {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
         String drinkstring = response.body();
         return null;
     }
@@ -99,7 +100,7 @@ public class RequestBuilder implements Request {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
         String drinkstring = response.body();
         return response;
     }
@@ -123,7 +124,22 @@ public class RequestBuilder implements Request {
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+        return response;
+    }
+
+    @Override
+    public HttpResponse<String> updateDrinkPut(String dir, String subDir, NewDrink object, Long DID, HttpClient client, Gson gson) throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir + "/" + DID))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(object)))
+                .build();
+//        System.out.println("request from  update drink put: " + request);
+//        System.out.println("object going out the update door: " + gson.toJson(object).toString());
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.statusCode());
         String drinkstring = response.body();
         return response;
     }
