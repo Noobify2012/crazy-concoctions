@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import net.minidev.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
@@ -282,9 +283,32 @@ public class ConsoleController implements Controller {
      */
     @Override
     public void buildNewRecipe() throws IOException, InterruptedException {
+        Request send = new RequestBuilder();
+        String dir = "drinks";
+        String subDir = "save";
         System.out.println("Time to build some drinks");
         DrinkBuilder drinkBuilder = new DrinkBuilder();
         NewDrink newDrink = drinkBuilder.buildNewDrink(scan, gson, this.user, client);
+        System.out.println("New drink going out the door: " + newDrink);
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(newDrink)))
+                .build();
+        System.out.println("Request body: ");
+        System.out.println(gson.toJson(newDrink));
+
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        String drinkstring = response.body();
+
+//        var newDrinkResponse = send.twoDirPost("drinks", "save", newDrink.toString(), "", client);
+        if (response.statusCode() == 200) {
+            System.out.println("GREAT SUCCESS I LIKE YOUR DRINK!!!!");
+        } else {
+            System.out.println(response.body());
+
+        }
         mainMenu();
     }
 

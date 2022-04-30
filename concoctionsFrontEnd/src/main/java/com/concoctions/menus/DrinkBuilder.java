@@ -60,19 +60,26 @@ public class DrinkBuilder implements DrinkBuilderInt {
 
         Type drinkIngredientListType = new TypeToken<List<DrinkIngredient>>() {}.getType();
         List<DrinkIngredient> drinkIngredientList = gson.fromJson(response.body(), drinkIngredientListType);
+        List<DrinkIngredientDto> drinkIngredientDtos = new ArrayList<>();
         //have user select ingredients
         boolean ingComplete = false;
         while(!ingComplete) {
             DrinkIngredient di = new DrinkIngredient();
+            DrinkIngredientDto ingredientDto = new DrinkIngredientDto();
             //get the ingredient
             Ingredient ingredient = getIngredient(ingredientList, scan);
             di.setIngredient(ingredient);
+            ingredientDto.setIngredientId(ingredient.getIngredientId());
             Uom uom = getUom(getAllUom(requestBuilder, client, gson), scan);
+            ingredientDto.setUomId(uom.getUomId());
             di.setUom(uom);
             System.out.println("Please enter the number of " + di.getUom().getName() + " of " + di.getIngredient().getName() + " you would like to add to the drink.");
             double amount = getUserInputDouble(scan);
             di.setAmount(amount);
+            ingredientDto.setAmount(amount);
             drinkIngredientList.add(di);
+            drinkIngredientDtos.add(ingredientDto);
+
             ingComplete = isComplete(scan);
             for (DrinkIngredient dil : drinkIngredientList) {
                 if (dil.getAmount() != 0.0) {
@@ -81,7 +88,7 @@ public class DrinkBuilder implements DrinkBuilderInt {
             }
         }
         //add ingredients to the new recipe
-        temp.setDrinkIngredients(drinkIngredientList);
+        temp.setDrinkIngredients(drinkIngredientDtos);
 
         //get possible food items
         String foodDir = "fooditem";
@@ -98,7 +105,6 @@ public class DrinkBuilder implements DrinkBuilderInt {
         boolean foodComplete = false;
         while(!foodComplete) {
             FoodItem fi = new FoodItem();
-            //TODO!!!!!!!!!!!!!!!!
             //get the ingredient
             fi = getFoodItem(foodList, scan);
             selectedFood.add(fi);
@@ -111,6 +117,18 @@ public class DrinkBuilder implements DrinkBuilderInt {
         //add ingredients to the new recipe
         temp.setFoodItemIds(foodIdList);
 
+        //get drink categories
+        String categoryDir = "category";
+        String categorySubDir = "all";
+        HttpResponse<String> categoryResponse = requestBuilder.twoDirGet(categoryDir,categorySubDir,"", "", client);
+        Type categoryListType = new TypeToken<List<Category>>() {}.getType();
+        List<Category> categoryList = gson.fromJson(categoryResponse.body(), categoryListType);
+        for (Category c : categoryList) {
+            System.out.println("Category: " + c.getName());
+        }
+
+        Long drinkCatId = getCategory(categoryList, scan);
+        temp.setCategoryId(drinkCatId);
 
         return temp;
     }
@@ -131,6 +149,23 @@ public class DrinkBuilder implements DrinkBuilderInt {
         return comp;
     }
 
+
+    private Long getCategory(List<Category> categoryList, Scanner scan) {
+        Category temp = new Category();
+        while (temp.getName() == null) {
+            System.out.println("Please enter the name of the category that you would like to use from the list.");
+            String ing = scan.nextLine();
+            boolean nameMatch = false;
+            for (Category i : categoryList) {
+                if (ing.equalsIgnoreCase(i.getName())) {
+                    temp = i;
+                    System.out.println("Adding " + i.getName());
+                    break;
+                }
+            }
+        }
+        return temp.getCategoryId();
+    }
     private Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
         Ingredient temp = new Ingredient();
         while (temp.getName() == null) {

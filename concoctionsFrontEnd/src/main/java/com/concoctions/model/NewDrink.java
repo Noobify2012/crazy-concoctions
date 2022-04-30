@@ -10,6 +10,7 @@ public class NewDrink {
     private long categoryId;
     private boolean isHot;
     private String description;
-    private List<DrinkIngredient> drinkIngredients;
+    //fix this
+    private List<DrinkIngredientDto> drinkIngredients;
     private List<Long> foodItemIds;
 }

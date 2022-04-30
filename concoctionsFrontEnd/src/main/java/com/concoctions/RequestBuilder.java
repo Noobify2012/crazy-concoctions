@@ -1,5 +1,6 @@
 package com.concoctions;
 
+import com.google.gson.JsonObject;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
@@ -90,17 +91,17 @@ public class RequestBuilder implements Request {
      * @return
      */
     @Override
-    public HttpResponse<String> twoDirPost(String dir, String subDir, String query, String userString, HttpClient client) throws IOException, InterruptedException {
+    public HttpResponse<String> twoDirPost(String dir, String subDir, String object, String userString, HttpClient client) throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/" + dir + "/" + subDir))
                 .header("Content-Type", "application/json")
-                .GET()
+                .POST(HttpRequest.BodyPublishers.ofString(object))
                 .build();
 
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
         String drinkstring = response.body();
-        return null;
+        return response;
     }
 
 
