@@ -20,6 +20,12 @@ If you want to dockerize the DB, from the main project directory run:
 ```bash
 docker-compose -f ./docker/docker-compose.yql up --build -d
 ```
+Docker is running the server on `3306`.
+If you want to change this, you'll need to 
+
+1. change `./docker/docker-compose.yml` under the ports line. It's in the format `[output port]:[internal port]`
+1. change `concoctionsBackend/src/main/resources/application.properties` so the line read `spring.datasource.url=jdbc:mysql://localhost:[ENTER output port NUMBER HERE]/concoctionsDB`
+1. follow the recompile  instructions below for the backend.
 
 #### **--- Local MySQL**
 
@@ -32,13 +38,13 @@ Both the backend and frontend are packaged in fatjars, so the only thing you nee
 So, from the main project folder, go ahead and run:
 
 ```bash
-java -jar [insert final backend jar file here]
+java -jar concoctionsBackend.jar 
 ```
 
 and in a another terminal (unless you're running this `nohup`)
 
 ```bash
-java -jar [insert finale frontend jar file here]
+java -jar concoctionsFrontend.jar 
 ```
 
 
@@ -90,6 +96,7 @@ Lesson Relearned - even if you think its going to be a quick and easy controller
 
 ## Future Work
 ### Backend
+- easier option changes for ports for the backend server and mysql port selection
 - better transaction management:
   right now, I'm not implementing much custom transaction management and letter spring use its default setting.
   This is definitely and issue as some transactions make additional calls to the database (like saving a drink) and I want to make sure all these calls to the db
