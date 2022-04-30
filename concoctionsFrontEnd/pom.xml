@@ -155,46 +155,14 @@
         </executions>
       </plugin>
 
-<!--      <plugin>-->
-<!--        <groupId>org.apache.maven.plugins</groupId>-->
-<!--        <artifactId>maven-assembly-plugin</artifactId>-->
-<!--        <version>3.1.1</version>-->
-<!--        <configuration>-->
-<!--          <descriptorRegs>-->
-<!--            <descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--          </descriptorRegs>-->
-<!--          <archive>-->
-<!--            <manifest>-->
-<!--              <manClass>com.concoctions.App</manClass>-->
-<!--            </manifest>-->
-<!--          </archive>-->
-<!--        </configuration>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <id>make-assembly</id>-->
-<!--            <phase>package</phase>-->
-<!--            <goals>-->
-<!--              <goal>single</goal>-->
-<!--            </goals>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
-
-
-
-      <!--        <plugin>-->
-      <!--          <groupId>org.apache.maven.plugins</groupId>-->
-      <!--          <artifactId>maven-shade-plugin</artifactId>-->
-      <!--          <version>3.2.4</version>-->
-      <!--          <executions>-->
-      <!--            <execution>-->
-      <!--              <phase>package</phase>-->
-      <!--              <goals>-->
-      <!--                <goal>shade</goal>-->
-      <!--              </goals>-->
-      <!--            </execution>-->
-      <!--          </executions>-->
-      <!--        </plugin>-->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <mainClass>com.concoctions.App</mainClass>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>

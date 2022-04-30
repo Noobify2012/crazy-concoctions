@@ -9,8 +9,8 @@
     <version>2.6.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>com.concotions</groupId>
-  <artifactId>concotionsBackend</artifactId>
+  <groupId>com.concoctions</groupId>
+  <artifactId>concoctionsBackend</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>concoctionsBackend</name>
   <description>concoctionsBackend</description>
