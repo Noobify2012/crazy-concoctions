@@ -43,30 +43,16 @@
       <scope>compile</scope>
     </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>com.concotions</groupId>-->
-<!--      <artifactId>concotionsBackend</artifactId>-->
-<!--      <version>0.0.1-SNAPSHOT</version>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>com.concotions</groupId>-->
-<!--      <artifactId>concotionsBackend</artifactId>-->
-<!--      <version>0.0.1-SNAPSHOT</version>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
-
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.13.2.2</version>
     </dependency>
-      <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-          <version>5.3.18</version>
-      </dependency>
+<!--      <dependency>-->
+<!--          <groupId>org.springframework</groupId>-->
+<!--          <artifactId>spring-web</artifactId>-->
+<!--          <version>5.3.18</version>-->
+<!--      </dependency>-->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
@@ -104,6 +90,14 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addClasspath>true</addClasspath>
+                <mainClass>com.concoctions.App</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -122,6 +116,8 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+
+
       </plugins>
     </pluginManagement>
     <plugins>
@@ -133,6 +129,74 @@
           <target>11</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>com.concoctions.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-assembly-plugin</artifactId>-->
+<!--        <version>3.1.1</version>-->
+<!--        <configuration>-->
+<!--          <descriptorRegs>-->
+<!--            <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--          </descriptorRegs>-->
+<!--          <archive>-->
+<!--            <manifest>-->
+<!--              <manClass>com.concoctions.App</manClass>-->
+<!--            </manifest>-->
+<!--          </archive>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>make-assembly</id>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>single</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
+
+
+      <!--        <plugin>-->
+      <!--          <groupId>org.apache.maven.plugins</groupId>-->
+      <!--          <artifactId>maven-shade-plugin</artifactId>-->
+      <!--          <version>3.2.4</version>-->
+      <!--          <executions>-->
+      <!--            <execution>-->
+      <!--              <phase>package</phase>-->
+      <!--              <goals>-->
+      <!--                <goal>shade</goal>-->
+      <!--              </goals>-->
+      <!--            </execution>-->
+      <!--          </executions>-->
+      <!--        </plugin>-->
+
     </plugins>
   </build>
+
 </project>

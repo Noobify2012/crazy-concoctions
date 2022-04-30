@@ -144,5 +144,3 @@ CREATE TABLE pairing (
     ON UPDATE CASCADE
 );
 
-
-

@@ -5,7 +5,6 @@ import com.concoctions.model.Category;
 import com.concoctions.model.Drink;
 import com.concoctions.model.DrinkIngredient;
 import com.concoctions.model.FoodItem;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONException;
