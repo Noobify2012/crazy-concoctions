@@ -91,16 +91,16 @@ Lesson Relearned - even if you think its going to be a quick and easy controller
 ## Future Work
 ### Backend
 - better transaction management:
-right now, I'm not implementing much custom transaction management and letter spring use its default setting.
-This is definitely and issue as some transactions make additional calls to the database (like saving a drink) and I want to make sure all these calls to the db
+  right now, I'm not implementing much custom transaction management and letter spring use its default setting.
+  This is definitely and issue as some transactions make additional calls to the database (like saving a drink) and I want to make sure all these calls to the db
 - better api calls:
-the api calls aren't super consistent. I'm learning, so I'm making some rookie mistakes and need to understand better, more consistent ways to make the calls
+  the api calls aren't super consistent. I'm learning, so I'm making some rookie mistakes and need to understand better, more consistent ways to make the calls
 - better object representation:
-this relates to the previous point, as the backend currently has DTO and regular objects. But, this can be refactored to use one object.
+  this relates to the previous point, as the backend currently has DTO and regular objects. But, this can be refactored to use one object.
 - validation:
-There's currently ***NO*** backend validation :)
+  There's currently ***NO*** backend validation :)
 - error handing:
-I mean, the server sends the right status code, but I'm not sure the user wants a full stack dump of the error in the body of the response when one occurs :)
+  I mean, the server sends the right status code, but I'm not sure the user wants a full stack dump of the error in the body of the response when one occurs :)
 
 ### Frontend
 - better code management, especially the menus:
