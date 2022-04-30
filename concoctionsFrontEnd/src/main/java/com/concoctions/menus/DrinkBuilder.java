@@ -133,7 +133,25 @@ public class DrinkBuilder implements DrinkBuilderInt {
         return temp;
     }
 
-    private boolean isComplete(Scanner scan) {
+    @Override
+    public boolean isComplete(Scanner scan) {
+        boolean comp = false;
+        boolean valid = false;
+        while (!valid) {
+            System.out.println("Would you like to add another item? (Y)es or (N)");
+            String temp = scan.nextLine();
+            if(temp.equalsIgnoreCase("No") | temp.equalsIgnoreCase("N")) {
+                comp = true;
+                valid = true;
+            } else if (temp.equalsIgnoreCase("Yes") | temp.equalsIgnoreCase("y")) {
+                valid = true;
+            }
+        }
+        return comp;
+    }
+
+    @Override
+    public boolean isCompleteRemove(Scanner scan) {
         boolean comp = false;
         boolean valid = false;
         while (!valid) {
@@ -166,7 +184,8 @@ public class DrinkBuilder implements DrinkBuilderInt {
         }
         return temp.getCategoryId();
     }
-    private Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
+    @Override
+    public Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
         Ingredient temp = new Ingredient();
         while (temp.getName() == null) {
             System.out.println("Please enter the name of an ingredient that you would like to use from the list.");
@@ -201,7 +220,8 @@ public class DrinkBuilder implements DrinkBuilderInt {
         return temp;
     }
 
-    private List<Uom> getAllUom(RequestBuilder requestBuilder, HttpClient client, Gson gson) throws IOException, InterruptedException {
+    @Override
+    public List<Uom> getAllUom(RequestBuilder requestBuilder, HttpClient client, Gson gson) throws IOException, InterruptedException {
         String ingredientDir = "uom";
         String ingredientSubDir = "all";
         HttpResponse<String> response = requestBuilder.twoDirGet(ingredientDir,ingredientSubDir,"", "", client);
@@ -214,7 +234,8 @@ public class DrinkBuilder implements DrinkBuilderInt {
         return uomList;
     }
 
-    private Uom getUom(List<Uom> ingredientList, Scanner scan) {
+    @Override
+    public Uom getUom(List<Uom> ingredientList, Scanner scan) {
         Uom temp = new Uom();
         while (temp.getName()== null) {
             System.out.println("Please enter the name of the unit of measure that you would like to use from the list.");
@@ -240,8 +261,8 @@ public class DrinkBuilder implements DrinkBuilderInt {
         }
         return temp;
     }
-
-    private double getUserInputDouble(Scanner scan) {
+    @Override
+    public double getUserInputDouble(Scanner scan) {
         String temp = scan.nextLine();
         double tempD = 0;
         if (temp.isEmpty()) {

@@ -2,6 +2,7 @@ package com.concoctions.menus;
 
 import com.concoctions.model.Comment;
 import com.concoctions.model.Drink;
+import com.concoctions.model.Ingredient;
 import com.concoctions.model.User;
 import com.google.gson.Gson;
 
@@ -19,4 +20,5 @@ public interface CommentBuilderInt {
     List<Comment> getCommentsByDrinkID(Long DID, Scanner scan, HttpClient client, Gson gson);
 
     void writeComment(User user, Scanner scan, HttpClient client, Gson gson) throws IOException, InterruptedException;
+
 }

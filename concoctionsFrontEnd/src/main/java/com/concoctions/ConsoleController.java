@@ -5,7 +5,6 @@ Remaining TODOs
 TODO Edit drink
 TODO COPY and Edit a drink
 TODO clean up drink parsing
-TODO add a comment
 TODO Documentation
  */
 
@@ -28,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -59,6 +59,8 @@ public class ConsoleController implements Controller {
 
     private CommentBuilderInt commentMenu;
 
+    private DrinkBuilderInt builder;
+
     public ConsoleController(Readable in, Appendable out, HttpClient client) {
         if (in == null || out == null) {
             throw new IllegalArgumentException("Readable and Appendable can't be null");
@@ -71,6 +73,7 @@ public class ConsoleController implements Controller {
         DrinkMenu = new DrinkMenu();
         this.request = new RequestBuilder();
         this.commentMenu = new CommentBuilder();
+        this.builder = new DrinkBuilder();
     }
 
     private String getUserInput() {
@@ -85,7 +88,7 @@ public class ConsoleController implements Controller {
     private void getRegStatus() throws IOException, InterruptedException, JSONException {
         System.out.println("Are you a registered user? if yes enter y or yes, if no enter no or n");
         String registered = getUserInput();
-        if (registered.equalsIgnoreCase("Y")){
+        if (registered.equalsIgnoreCase("Y")| registered.equalsIgnoreCase("yes")){
             System.out.println("Welcome Back!");
             login();
         } else if (registered.equalsIgnoreCase("N") | registered.equalsIgnoreCase("NO")) {
@@ -333,7 +336,7 @@ public class ConsoleController implements Controller {
         System.out.println("Which drink would you like to remove or edit? ");
         String drinkName = getUserInput();
         System.out.println("Size of usersDrinks: " + usersDrinks.size());
-        System.out.println("Drink name recieved: " + drinkName);
+        System.out.println("Drink name received: " + drinkName);
         for (int i = 0; i < usersDrinks.size(); i++){
             System.out.println("Current Drink Name: " + usersDrinks.get(i).getName());
             if (usersDrinks.get(i).getName().equalsIgnoreCase(drinkName)) {
@@ -360,12 +363,153 @@ public class ConsoleController implements Controller {
             }
         } else if (action.equalsIgnoreCase("E") | action.equalsIgnoreCase("Edit")) {
             //TODO method to edit drink
-        } else {
-            System.out.println("Sorry that's not an option lets start over.");
+
+            NewDrink updatedDrink = new NewDrink();
+            boolean complete = false;
+            List<DrinkIngredient> drinkIngredients = drink.getDrinkIngredients();
+            //while loop until complete
+            while (!complete) {
+
+
+                String ingredientChangeChoice = "";
+                while (ingredientChangeChoice.isEmpty()) {
+                    System.out.println("Do you want to add or remove an ingredient? (A)dd or (R)emove");
+                    ingredientChangeChoice = getUserInput();
+                    if (ingredientChangeChoice.equalsIgnoreCase("A") | (ingredientChangeChoice.equalsIgnoreCase("Add"))) {
+                        //get all possible ingredients
+                        String ingredientDir = "ingredients";
+                        String ingredientSubDir = "all";
+                        HttpResponse<String> response = request.twoDirGet(ingredientDir, ingredientSubDir, "", "", client);
+                        Type ingredientListType = new TypeToken<List<Ingredient>>() {
+                        }.getType();
+                        //List of all possible ingredients
+                        List<Ingredient> ingredientList = gson.fromJson(response.body(), ingredientListType);
+                        for (Ingredient d : ingredientList) {
+                            System.out.println("Ingredient: " + d.getName());
+                        }
+
+                        //
+                        Type drinkIngredientListType = new TypeToken<List<DrinkIngredient>>() {
+                        }.getType();
+                        List<DrinkIngredient> drinkIngredientList = gson.fromJson(response.body(), drinkIngredientListType);
+
+
+                        //have user select ingredients
+                        boolean ingComplete = false;
+                        while (!ingComplete) {
+                            //make new drink ingredient to add
+                            DrinkIngredient di = new DrinkIngredient();
+
+                            //get the ingredient
+                            Ingredient ingredient = getIngredient(ingredientList, scan);
+                            //set the ingredient
+                            di.setIngredient(ingredient);
+
+                            //get the uom from the user
+                            Uom uom = builder.getUom(builder.getAllUom((RequestBuilder) request, client, gson), scan);
+
+                            di.setUom(uom);
+                            //
+                            System.out.println("Please enter the number of " + di.getUom().getName() + " of " + di.getIngredient().getName() + " you would like to add to the drink.");
+                            //get the amount of ingredient
+                            double amount = builder.getUserInputDouble(scan);
+                            //set ingredient amount
+                            di.setAmount(amount);
+
+                            //add ingredient to the drink
+                            drinkIngredientList.add(di);
+                            drinkIngredients.add(di);
+
+                            //do i want to add more
+                            ingComplete = builder.isComplete(scan);
+                            for (DrinkIngredient dil : drinkIngredients) {
+                                if (dil.getAmount() != 0.0) {
+                                    System.out.println("Ingredient: " + dil.getAmount() + " " + dil.getUom().getName() + " " + dil.getIngredient().getName());
+                                }
+                            }
+                        }
+
+                    } else if (ingredientChangeChoice.equalsIgnoreCase("R") | (ingredientChangeChoice.equalsIgnoreCase("Remove"))) {
+                        //print ingredients in drink
+                        // list ingredients
+
+                        String ingredientToRemoveName = "";
+                        DrinkIngredient ingredientToRemove = new DrinkIngredient();
+                        while (ingredientToRemoveName.isEmpty()) {
+                            for (DrinkIngredient di : drinkIngredients) {
+                                System.out.println("Ingredient: " + di.getIngredient().getName());
+                            }
+                            //select ingredient to remove
+                            System.out.println("Please select an ingredient from the list above to remove.");
+                            ingredientToRemoveName = getUserInput();
+
+                            for (DrinkIngredient di : drinkIngredients) {
+                                if (ingredientToRemoveName.equalsIgnoreCase(di.getIngredient().getName())) {
+                                    System.out.println("Found the ingredient");
+                                    //remove from recipe
+                                    drinkIngredients.remove(di);
+                                    break;
+                                }
+                            }
+                            if (ingredientToRemove == null) {
+                                System.out.println("I'm sorry we couldn't find that ingredient, lets try again.");
+                            }
+                        }
+
+                    } else {
+                        System.out.println("I'm sorry that isn't a valid choice, please try again. ");
+                        ingredientChangeChoice = "";
+                    }
+                }
+                System.out.println("This is for the entire drink");
+                complete = builder.isComplete(scan);
+
+            }
+            System.out.println("New List: " + drinkIngredients);
+//            mainMenu();
         }
 
 
-        mainMenu();
+            // select ingredient to add
+//                        List<DrinkIngredientDto> drinkIngredientDtos = new ArrayList<>();
+//            drinkIngredientDtos.add(ingredientDto);
+//            //get dto read for ingredient
+//            DrinkIngredientDto ingredientDto = new DrinkIngredientDto();
+//            //add the ingredient id to the DTO
+//            ingredientDto.setIngredientId(ingredient.getIngredientId());
+//            //set the uom in the dto for the new ingredient
+//            ingredientDto.setUomId(uom.getUomId());
+//            ingredientDto.setAmount(amount);
+
+
+        }
+
+
+
+
+            //after done changing, check against control
+
+            //if drink doesn't match control write back
+
+
+
+
+    private Ingredient getIngredient(List<Ingredient> ingredientList, Scanner scan) {
+        Ingredient temp = new Ingredient();
+        while (temp.getName() == null) {
+            System.out.println("Please enter the name of an ingredient that you would like to use from the list.");
+            String ing = scan.nextLine();
+
+            boolean nameMatch = false;
+            for (Ingredient i : ingredientList) {
+                if (ing.equalsIgnoreCase(i.getName())) {
+                    temp = i;
+                    System.out.println("Adding " + i.getName());
+                    break;
+                }
+            }
+        }
+        return temp;
     }
 
 
